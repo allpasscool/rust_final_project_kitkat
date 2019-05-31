@@ -8,49 +8,14 @@ use rs_graph::linkedlistgraph::*;
 use rs_graph::attributes::{NodeAttributes, EdgeAttributes, AttributedGraph};
 use rs_graph::builder::*;
 use crate::Builder;
-
-// #[derive(Clone, Default)]
-// struct NodeData {
-//     balance: f64,
-// }
-
-// #[derive(Clone, Default)]
-// struct EdgeData {
-//     bound: f64,
-// }
-
-// #[derive(Graph)]
-// struct MyGraph {
-//     #[graph] graph: LinkedListGraph,
-//     #[nodeattrs(NodeData)] nodedata: Vec<NodeData>,
-//     #[edgeattrs(EdgeData)] edgedata: Vec<EdgeData>,
-// }
-
-// #[derive(Graph)]
-// struct MyGraph2 {
-//     #[graph] graph: LinkedListGraph,
-//     #[nodeattrs(NodeData)] nodedata: Vec<NodeData>,
-//     #[edgeattrs(EdgeData)] edgedata: Vec<EdgeData>,
-// }
-
-// impl From<LinkedListGraph> for MyGraph {
-//     fn from(g: LinkedListGraph) -> MyGraph {
-//         let n = g.num_nodes();
-//         let m = g.num_edges();
-//         MyGraph {
-//             graph: g,
-//             nodedata: vec![Default::default(); n],
-//             edgedata: vec![Default::default(); m],
-//         }
-//     }
-// }
+// use graph_propagation;
 
 fn main() {
     
     build_MyGraph_test();
 }
 
-#[cfg_attr(feature = "cargo-clippy", allow(needless_range_loop))]
+// #[cfg_attr(feature = "cargo-clippy", allow(needless_range_loop))]
 fn build_MyGraph_test(){
     println!("enter build my graph test");
 
@@ -133,7 +98,7 @@ struct MyEdgeData {
     reverse_edge: usize,
 }
 
-// supported data
+// supported data file
 const supported_file: &'static [&'static str] = &["ego-Facebook"];
 
 impl MyGraph_final{
@@ -179,12 +144,22 @@ impl MyGraph_final{
     }
 
     //TODO
-    fn get_node(&mut self, id: usize) -> rs_graph::linkedlistgraph::Node{
-        self.graph.id2node(id)
+    fn get_node(){
+
     }
 
     //TODO
     fn get_edge(){
+
+    }
+
+    //TODO
+    fn get_id2node(&mut self, id: usize) -> rs_graph::linkedlistgraph::Node{
+        self.graph.id2node(id)
+    }
+
+    //TODO
+    fn get_id2edge(){
 
     }
 
@@ -206,6 +181,24 @@ impl MyGraph_final{
         self.graph.node_mut(new_node).influence = data.influence;
         new_node
     }
+
+    //TODO
+    fn get_node_id(){
+
+    }
+
+    //TODO
+    fn get_edge_id(){
+
+    }
+
+    //TODO
+    ///given edge, get node from and node to
+    fn get_edge_nodes(){
+
+    }
+
+
 
     //TODO
     fn add_edge(&mut self, n1: rs_graph::linkedlistgraph::Node, n2: rs_graph::linkedlistgraph::Node, data: MyEdgeData) -> rs_graph::linkedlistgraph::Edge{
@@ -277,6 +270,34 @@ impl MyGraph_final{
             self.graph.edge_mut(reverse_edge).weight_2t1 = weight1;
             self.graph.edge_mut(reverse_edge).weight_1t2 = weight2;
         }
+    }
+
+    //TODO
+    fn setWeight(){
+
+    }
+
+    //TODO
+    fn setThreshold(){
+
+    }
+
+    //TODO
+    fn setNodeLable(){
+
+    }
+
+    //TODO
+    fn setNodeInfluence(){
+
+    }
+
+    //we shouldn't need this one
+    //fn setEdgeLable()
+
+    //TODO
+    fn setEdgeLable(){
+
     }
 
     //TODO
