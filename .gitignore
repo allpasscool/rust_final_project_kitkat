@@ -1,1 +1,3 @@
 graph_propagation/target/*
+graph_propagation/target/doc/*
+*.html
