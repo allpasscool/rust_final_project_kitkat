@@ -1,0 +1,10 @@
+[package]
+name = "graph_propagation"
+version = "0.1.0"
+authors = ["yishanlin0128 <a82012844013@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+rs-graph-derive = "0.17.0"
+rs-graph = "0.17.0"
+rand = "0.6.5"
