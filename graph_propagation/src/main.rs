@@ -10,50 +10,8 @@ use rs_graph::builder::*;
 use crate::Builder;
 // use graph_propagation;
 
-fn main() {
-    
-    build_MyGraph_test();
-}
-
-// #[cfg_attr(feature = "cargo-clippy", allow(needless_range_loop))]
-fn build_MyGraph_test(){
-    println!("enter build my graph test");
-
-    let mut myG = MyGraph_final::new(None, None, PropagationModel::LT);
-    let (n1, n2, n3) = (
-                        myG.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5}),
-                        myG.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5}),
-                        myG.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5})
-    );
-    let (e12, e13) = (
-                        myG.add_edge(n1, n2, MyEdgeData{from: myG.graph.node_id(n1), to: myG.graph.node_id(n2), label_1t2: 0, weight_1t2: 1.0, label_2t1: 0, weight_2t1: 0.6, reverse_edge: 0}),
-                        myG.add_edge(n1, n3, MyEdgeData{from: myG.graph.node_id(n1), to: myG.graph.node_id(n3), label_1t2: 0, weight_1t2: 1.0, label_2t1: 0, weight_2t1: 0.6, reverse_edge: 0})
-    );
-
-    myG.InitializeNodeLabel();
-    myG.InitializeNodeThreshold(ThresholdSet::baseline(0.1));
-    myG.InitializeEdgeLabel();
-    myG.InitializeWeight();
-
-    for i in myG.graph.nodes(){
-        println!("id:{} label:{} Threshold:{}", myG.graph.node_id(i), myG.graph.node(i).label, myG.graph.node(i).threshold);
-    }
-
-    for i in myG.graph.edges(){
-        println!("id:{} from:{} to:{} label_1t2:{} label_2t1:{} weight_1t2:{} weight_2t1:{} reverse_edge_id:{}",
-                myG.graph.edge_id(i),
-                myG.graph.edge(i).from,
-                myG.graph.edge(i).to,
-                myG.graph.edge(i).label_1t2,
-                myG.graph.edge(i).label_2t1,
-                myG.graph.edge(i).weight_1t2,
-                myG.graph.edge(i).weight_2t1,
-                myG.graph.edge(i).reverse_edge);
-    }
-
-}
-
 //MyGraph
+//This is an undirected graph
 #[derive(Graph)]
 struct MyGraph_final {
     #[graph] graph: LinkedListGraph::<u32, MyNodeData, MyEdgeData, ()>,
@@ -150,30 +108,30 @@ impl MyGraph_final{
 
     //TODO
     fn get_edge(){
-
+    
     }
 
-    //TODO
+    //node id to node
     fn get_id2node(&mut self, id: usize) -> rs_graph::linkedlistgraph::Node{
         self.graph.id2node(id)
     }
 
-    //TODO
-    fn get_id2edge(){
-
+    //edge id to edge
+    fn get_id2edge(&mut self, id: usize) -> rs_graph::linkedlistgraph::Edge{
+        self.graph.id2edge(id)
     }
 
-    //TODO
-    fn get_nodes(){
-
+    //get all nodes
+    fn get_nodes(&mut self) -> rs_graph::linkedlistgraph::NodeIter<u32>{
+        self.graph.nodes()
     }
 
-    //TODO
-    fn get_edges(){
-
+    //get all edges
+    fn get_edges(&mut self) -> rs_graph::linkedlistgraph::EdgeIter<u32>{
+        self.graph.edges()
     }
 
-    //TODO
+    //add new node with attribute
     fn add_node(&mut self, data: MyNodeData) -> rs_graph::linkedlistgraph::Node{
         let new_node = self.graph.add_node();
         self.graph.node_mut(new_node).label = data.label;
@@ -182,25 +140,22 @@ impl MyGraph_final{
         new_node
     }
 
-    //TODO
-    fn get_node_id(){
-
+    //get node id
+    fn get_node_id(&mut self, n: rs_graph::linkedlistgraph::Node) -> usize{
+        self.graph.node_id(n)
     }
 
-    //TODO
-    fn get_edge_id(){
-
+    //get edge id
+    fn get_edge_id(&mut self, e: rs_graph::linkedlistgraph::Edge) -> usize{
+        self.graph.edge_id(e)
     }
 
-    //TODO
     ///given edge, get node from and node to
-    fn get_edge_nodes(){
-
+    fn get_edge_nodes(&mut self, e : rs_graph::linkedlistgraph::Edge) -> (rs_graph::linkedlistgraph::Edge, rs_graph::linkedlistgraph::Edge){
+        (self.get_id2edge(self.graph.edge(e).from), self.get_id2edge(self.graph.edge(e).to))
     }
 
-
-
-    //TODO
+    //add edge
     fn add_edge(&mut self, n1: rs_graph::linkedlistgraph::Node, n2: rs_graph::linkedlistgraph::Node, data: MyEdgeData) -> rs_graph::linkedlistgraph::Edge{
         let new_edge = self.graph.add_edge(n2, n1);
         self.graph.edge_mut(new_edge).from = self.graph.node_id(n2);
@@ -224,7 +179,7 @@ impl MyGraph_final{
         new_edge1
     }
 
-    //TODO
+    //initialize node label to 0
     fn InitializeNodeLabel(&mut self){
         let nodes = self.graph.nodes();
 
@@ -233,7 +188,7 @@ impl MyGraph_final{
         }
     }
 
-    //TODO
+    //initialize nodes' threshold to random between 0 and 1, or to a baseline
     fn InitializeNodeThreshold(&mut self, set: ThresholdSet){
         let nodes = self.graph.nodes();
         for i in nodes{
@@ -244,7 +199,7 @@ impl MyGraph_final{
         }
     }
 
-    //TODO
+    //initialize edge label to 0
     fn InitializeEdgeLabel(&mut self){
         let edges = self.graph.edges();
 
@@ -255,7 +210,7 @@ impl MyGraph_final{
 
     }
 
-    //TODO
+    //initialized edge weight which means n1 to n2, is directed
     fn InitializeWeight(&mut self){
         let edges = self.graph.edges();
 
@@ -301,12 +256,56 @@ impl MyGraph_final{
     }
 
     //TODO
-    fn selectSeed(&mut self, way: String, num: u32){
+    fn selectSeed(&mut self, way: String, num: usize){
 
     }
 
     //TODO
-    fn propagte(&mut self, runs: u32){
+    fn propagte(&mut self, runs: usize){
 
     }
+}
+
+
+fn main() {
+    
+    build_MyGraph_test();
+}
+
+// #[cfg_attr(feature = "cargo-clippy", allow(needless_range_loop))]
+fn build_MyGraph_test(){
+    println!("enter build my graph test");
+
+    let mut myG = MyGraph_final::new(None, None, PropagationModel::LT);
+    let (n1, n2, n3) = (
+                        myG.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5}),
+                        myG.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5}),
+                        myG.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5})
+    );
+    let (e12, e13) = (
+                        myG.add_edge(n1, n2, MyEdgeData{from: myG.graph.node_id(n1), to: myG.graph.node_id(n2), label_1t2: 0, weight_1t2: 1.0, label_2t1: 0, weight_2t1: 0.6, reverse_edge: 0}),
+                        myG.add_edge(n1, n3, MyEdgeData{from: myG.graph.node_id(n1), to: myG.graph.node_id(n3), label_1t2: 0, weight_1t2: 1.0, label_2t1: 0, weight_2t1: 0.6, reverse_edge: 0})
+    );
+
+    myG.InitializeNodeLabel();
+    myG.InitializeNodeThreshold(ThresholdSet::baseline(0.1));
+    myG.InitializeEdgeLabel();
+    myG.InitializeWeight();
+
+    for i in myG.graph.nodes(){
+        println!("id:{} label:{} Threshold:{}", myG.graph.node_id(i), myG.graph.node(i).label, myG.graph.node(i).threshold);
+    }
+
+    for i in myG.graph.edges(){
+        println!("id:{} from:{} to:{} label_1t2:{} label_2t1:{} weight_1t2:{} weight_2t1:{} reverse_edge_id:{}",
+                myG.graph.edge_id(i),
+                myG.graph.edge(i).from,
+                myG.graph.edge(i).to,
+                myG.graph.edge(i).label_1t2,
+                myG.graph.edge(i).label_2t1,
+                myG.graph.edge(i).weight_1t2,
+                myG.graph.edge(i).weight_2t1,
+                myG.graph.edge(i).reverse_edge);
+    }
+
 }
