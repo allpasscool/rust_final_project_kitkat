@@ -1,5 +1,4 @@
 extern crate rand;
-extern crate graph_propagation;
 
 use rand::{thread_rng, Rng};
 use rs_graph_derive::Graph;
@@ -9,66 +8,65 @@ use rs_graph::linkedlistgraph::*;
 use rs_graph::attributes::{NodeAttributes, EdgeAttributes, AttributedGraph};
 use rs_graph::builder::*;
 use crate::Builder;
-use graph_propagation::*;
+// use graph_propagation;
 
-/*
 //MyGraph
 //This is an undirected graph
 #[derive(Graph)]
-struct MyGraph_final {
-    #[graph] graph: LinkedListGraph::<u32, MyNodeData, MyEdgeData, ()>,
-    #[nodeattrs(MyNodeData)] nodedata: Vec<MyNodeData>,
-    #[edgeattrs(MyEdgeData)] edgedata: Vec<MyEdgeData>,
-    propagation_model: PropagationModel,
-    seed: Vec<usize>,
-    next_to_propagate: Vec<usize>,
+pub struct MyGraph_final {
+    #[graph] pub graph: LinkedListGraph::<u32, MyNodeData, MyEdgeData, ()>,
+    #[nodeattrs(MyNodeData)] pub nodedata: Vec<MyNodeData>,
+    #[edgeattrs(MyEdgeData)] pub edgedata: Vec<MyEdgeData>,
+    pub propagation_model: PropagationModel,
+    pub seed: Vec<usize>,
+    pub next_to_propagate: Vec<usize>,
 }
 
-enum PropagationModel{
+pub enum PropagationModel{
     LT, //linear threshold
     IC, //independent cascade
 }
 
-enum SeedSelection{
+pub enum SeedSelection{
     max_degree,
     min_degree,
     random,
 }
 
-enum ThresholdSet{
+pub enum ThresholdSet{
     rand,
     baseline(f64),
 }
 
-enum WeightSet{
+pub enum WeightSet{
     OneOverOutdegree, // 1 / outdegree
     random,         // random
     equal(f64),          //equal
 }
 
 #[derive(Clone, Default)]
-struct MyNodeData {
-    label: usize,
-    threshold: f64,
-    influence: f64,
+pub struct MyNodeData {
+    pub label: usize,
+    pub threshold: f64,
+    pub influence: f64,
 }
 
 #[derive(Clone, Default)]
-struct MyEdgeData {
-    from: usize,
-    to: usize,
-    label_1t2: usize,
-    weight_1t2: f64,
-    label_2t1: usize,
-    weight_2t1: f64,
-    reverse_edge: usize,
+pub struct MyEdgeData {
+    pub from: usize,
+    pub to: usize,
+    pub label_1t2: usize,
+    pub weight_1t2: f64,
+    pub label_2t1: usize,
+    pub weight_2t1: f64,
+    pub reverse_edge: usize,
 }
 
 // supported data file
-const supported_file: &'static [&'static str] = &["ego-Facebook"];
+pub const supported_file: &'static [&'static str] = &["ego-Facebook"];
 
 impl MyGraph_final{
-    fn new(file_name: Option<String>, file_loc: Option<String>, propa_model: PropagationModel) -> MyGraph_final{
+    pub fn new(file_name: Option<String>, file_loc: Option<String>, propa_model: PropagationModel) -> MyGraph_final{
         let read_file = false;
         
         //if supported file
@@ -110,47 +108,47 @@ impl MyGraph_final{
     }
 
     //TODO
-    fn get_node(){
+    pub fn get_node(){
 
     }
 
     //TODO
-    fn get_edge(){
+    pub fn get_edge(){
     
     }
 
     //node id to node
-    fn get_id2node(&mut self, id: usize) -> rs_graph::linkedlistgraph::Node{
+    pub fn get_id2node(&mut self, id: usize) -> rs_graph::linkedlistgraph::Node{
         self.graph.id2node(id)
     }
 
     //edge id to edge
-    fn get_id2edge(&mut self, id: usize) -> rs_graph::linkedlistgraph::Edge{
+    pub fn get_id2edge(&mut self, id: usize) -> rs_graph::linkedlistgraph::Edge{
         self.graph.id2edge(id)
     }
 
     //get all nodes
-    fn get_nodes(&mut self) -> rs_graph::linkedlistgraph::NodeIter<u32>{
+    pub fn get_nodes(&mut self) -> rs_graph::linkedlistgraph::NodeIter<u32>{
         self.graph.nodes()
     }
 
     //get all edges
-    fn get_edges(&mut self) -> rs_graph::linkedlistgraph::EdgeIter<u32>{
+    pub fn get_edges(&mut self) -> rs_graph::linkedlistgraph::EdgeIter<u32>{
         self.graph.edges()
     }
 
     //get nodes number
-    fn get_nodes_number(&mut self) -> usize{
+    pub fn get_nodes_number(&mut self) -> usize{
         self.graph.num_nodes()
     }
 
     //get edges number
-    fn get_edges_number(&mut self) -> usize{
+    pub fn get_edges_number(&mut self) -> usize{
         self.graph.num_edges()
     }
 
     //add new node with attribute
-    fn add_node(&mut self, data: MyNodeData) -> rs_graph::linkedlistgraph::Node{
+    pub fn add_node(&mut self, data: MyNodeData) -> rs_graph::linkedlistgraph::Node{
         let new_node = self.graph.add_node();
         self.graph.node_mut(new_node).label = data.label;
         self.graph.node_mut(new_node).threshold = data.threshold;
@@ -159,39 +157,39 @@ impl MyGraph_final{
     }
 
     //get node id
-    fn get_node_id(&mut self, n: rs_graph::linkedlistgraph::Node) -> usize{
+    pub fn get_node_id(&mut self, n: rs_graph::linkedlistgraph::Node) -> usize{
         self.graph.node_id(n)
     }
 
     //get edge id
-    fn get_edge_id(&mut self, e: rs_graph::linkedlistgraph::Edge) -> usize{
+    pub fn get_edge_id(&mut self, e: rs_graph::linkedlistgraph::Edge) -> usize{
         self.graph.edge_id(e)
     }
 
     ///given edge, get node from and node to
-    fn get_edge_nodes(&mut self, e : rs_graph::linkedlistgraph::Edge) -> (rs_graph::linkedlistgraph::Edge, rs_graph::linkedlistgraph::Edge){
+    pub fn get_edge_nodes(&mut self, e : rs_graph::linkedlistgraph::Edge) -> (rs_graph::linkedlistgraph::Edge, rs_graph::linkedlistgraph::Edge){
         (self.get_id2edge(self.graph.edge(e).from), self.get_id2edge(self.graph.edge(e).to))
     }
 
     //get neighbors
-    fn get_neighbors(&mut self, n: rs_graph::linkedlistgraph::Node) -> rs_graph::linkedlistgraph::NeighIter<u32, MyEdgeData, ()>{
+    pub fn get_neighbors(&mut self, n: rs_graph::linkedlistgraph::Node) -> rs_graph::linkedlistgraph::NeighIter<u32, MyEdgeData, ()>{
         self.graph.neighs(n)
     }
 
     //get outedges
 
     //get node label
-    fn get_node_label(& self, n: rs_graph::linkedlistgraph::Node) -> usize{
+    pub fn get_node_label(& self, n: rs_graph::linkedlistgraph::Node) -> usize{
         self.graph.node(n).label
     }
 
     //get edge label 1t2
-    fn get_edge_label(&self, e: rs_graph::linkedlistgraph::Edge) -> usize{
+    pub fn get_edge_label(&self, e: rs_graph::linkedlistgraph::Edge) -> usize{
         self.graph.edge(e).label_1t2
     }
 
     //add edge
-    fn add_edge(&mut self, n1: rs_graph::linkedlistgraph::Node, n2: rs_graph::linkedlistgraph::Node, data: MyEdgeData) -> rs_graph::linkedlistgraph::Edge{
+    pub fn add_edge(&mut self, n1: rs_graph::linkedlistgraph::Node, n2: rs_graph::linkedlistgraph::Node, data: MyEdgeData) -> rs_graph::linkedlistgraph::Edge{
         let new_edge = self.graph.add_edge(n2, n1);
         self.graph.edge_mut(new_edge).from = self.graph.node_id(n2);
         self.graph.edge_mut(new_edge).to = self.graph.node_id(n1);
@@ -215,7 +213,7 @@ impl MyGraph_final{
     }
 
     //initialize node label to 0
-    fn Initialize_Node_Label(&mut self){
+    pub fn Initialize_Node_Label(&mut self){
         let nodes = self.graph.nodes();
 
         for i in nodes{
@@ -224,7 +222,7 @@ impl MyGraph_final{
     }
 
     //initialize nodes' threshold to random between 0 and 1, or to a baseline
-    fn Initialize_Node_Threshold(&mut self, set: ThresholdSet){
+    pub fn Initialize_Node_Threshold(&mut self, set: ThresholdSet){
         let nodes = self.graph.nodes();
         for i in nodes{
             match set{
@@ -235,7 +233,7 @@ impl MyGraph_final{
     }
 
     //initialize edge label to 0
-    fn Initialize_Edge_Label(&mut self){
+    pub fn Initialize_Edge_Label(&mut self){
         let edges = self.graph.edges();
 
         for i in edges{
@@ -246,7 +244,7 @@ impl MyGraph_final{
     }
 
     //initialized edge weight which means n1 to n2, is directed
-    fn Initialize_Weight(&mut self, way: WeightSet){
+    pub fn Initialize_Weight(&mut self, way: WeightSet){
         match way{
             WeightSet::random => {
                 let edges = self.graph.edges();
@@ -269,19 +267,19 @@ impl MyGraph_final{
     }
 
     //set weight n1 to n2
-    fn setWeight(&mut self, e: rs_graph::linkedlistgraph::Edge, weight: f64){
+    pub fn setWeight(&mut self, e: rs_graph::linkedlistgraph::Edge, weight: f64){
         self.graph.edge_mut(e).weight_1t2 = weight;
         let reverse_edge = self.graph.id2edge(self.graph.edge(e).reverse_edge);
         self.graph.edge_mut(reverse_edge).weight_2t1 = weight;
     }
 
     //set node's threshold
-    fn setThreshold(&mut self, n: rs_graph::linkedlistgraph::Node, threshold: f64){
+    pub fn setThreshold(&mut self, n: rs_graph::linkedlistgraph::Node, threshold: f64){
         self.graph.node_mut(n).threshold = threshold;
     }
 
     //set node's label
-    fn setNodeLabel(&mut self, n: rs_graph::linkedlistgraph::Node, label: usize){
+    pub fn setNodeLabel(&mut self, n: rs_graph::linkedlistgraph::Node, label: usize){
         self.graph.node_mut(n).label = label;
     }
 
@@ -292,7 +290,7 @@ impl MyGraph_final{
 
     //maybe we don't need this one
     //set edge labe
-    fn setEdgeLabel(&mut self, e: rs_graph::linkedlistgraph::Edge, label: usize){
+    pub fn setEdgeLabel(&mut self, e: rs_graph::linkedlistgraph::Edge, label: usize){
         self.graph.edge_mut(e).label_1t2 = label;
         let reverse_edge = self.graph.edge(e).reverse_edge;
         let reverse_edge = self.get_id2edge(reverse_edge);
@@ -300,7 +298,7 @@ impl MyGraph_final{
     }
 
     //TODO
-    fn selectSeed(&mut self, way: SeedSelection, num: usize, label: usize){
+    pub fn selectSeed(&mut self, way: SeedSelection, num: usize, label: usize){
         match way{
             SeedSelection::max_degree => {
 
@@ -325,13 +323,13 @@ impl MyGraph_final{
 
 
     //before propagation, put seed into next to propagate
-    fn initialize_Propagate(&mut self){
+    pub fn initialize_Propagate(&mut self){
 
         self.next_to_propagate = self.seed.clone();
     }
 
     //TODO
-    fn propagte(&mut self, runs: usize){
+    pub fn propagte(&mut self, runs: usize){
         
         match self.propagation_model{
             PropagationModel::IC => {
@@ -386,7 +384,6 @@ impl MyGraph_final{
         }
     }
 }
-*/
 
 fn main() {
     
@@ -398,7 +395,7 @@ fn build_My_Graph_test(){
     println!("enter build my graph test");
 
     //build a graph with three nodes and 2 edges
-    let mut myG = graph_propagation::MyGraph_final::new(None, None, PropagationModel::IC);
+    let mut myG = MyGraph_final::new(None, None, PropagationModel::IC);
     let (n1, n2, n3) = (
                         myG.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5}),
                         myG.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5}),
