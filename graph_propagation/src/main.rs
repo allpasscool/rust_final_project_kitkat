@@ -95,8 +95,8 @@ struct MyGraph_final {
     #[nodeattrs(MyNodeData)] nodedata: Vec<MyNodeData>,
     #[edgeattrs(MyEdgeData)] edgedata: Vec<MyEdgeData>,
     propagation_model: PropagationModel,
-    seed: Vec<i64>,
-    next_to_propagate: Vec<i128>,
+    seed: Vec<usize>,
+    next_to_propagate: Vec<usize>,
 }
 
 enum PropagationModel{
@@ -107,7 +107,7 @@ enum PropagationModel{
 enum SeedSelection{
     max_degree,
     min_degree,
-    randome,
+    random,
 }
 
 enum ThresholdSet{
@@ -189,6 +189,16 @@ impl MyGraph_final{
     }
 
     //TODO
+    fn get_nodes(){
+
+    }
+
+    //TODO
+    fn get_edges(){
+
+    }
+
+    //TODO
     fn add_node(&mut self, data: MyNodeData) -> rs_graph::linkedlistgraph::Node{
         let new_node = self.graph.add_node();
         self.graph.node_mut(new_node).label = data.label;
@@ -257,41 +267,6 @@ impl MyGraph_final{
         let edges = self.graph.edges();
 
         for i in edges{
-            // let (n1, n2) = self.graph.enodes(i);
-            // let mut notFound = true;
-            
-            // let neighbor1: Vec<_> = self.graph.neighs(n1).collect();
-
-            // for &(e, v) in &neighbor1{
-            //     if self.graph.node_id(v) == self.graph.node_id(n2){
-            //         let e1: rs_graph::linkedlistgraph::Edge = e;
-            //         self.graph.edge_mut(e1).weight_1t2 = rand::thread_rng().gen();
-            //         notFound = false;
-            //         break;
-            //     }
-            // }
-
-            // if notFound{
-            //     panic!("not found edge: {} {}", n1, n2);
-            // }
-
-            // notFound = true;
-            
-            // let neighbor2: Vec<_> = self.graph.neighs(n2).collect();
-            // let e2: rs_graph::linkedlistgraph::Edge;
-            // for &(e, v) in &neighbor2{
-            //     if self.graph.node_id(v) == self.graph.node_id(n1){
-            //         let e2: rs_graph::linkedlistgraph::Edge = e;
-            //         self.graph.edge_mut(e2).weight_2t1 = rand::thread_rng().gen();
-            //         notFound = false;
-            //         break;
-            //     }
-            // }
-
-            // if notFound{
-            //     panic!("not found edge: {} {}", n2, n1);
-            // }
-
             let weight1 = rand::thread_rng().gen();
             let weight2 = rand::thread_rng().gen();
             self.graph.edge_mut(i).weight_1t2 = weight1;
