@@ -39,9 +39,9 @@ pub enum ThresholdSet{
 }
 
 pub enum WeightSet{
-    OneOverOutdegree, // 1 / outdegree
-    random,         // random
-    equal(f64),          //equal
+    OneOverOutdegree,   // 1 / outdegree
+    random,             // random
+    equal(f64),         //equal
 }
 
 #[derive(Clone, Default)]
@@ -66,37 +66,27 @@ pub struct MyEdgeData {
 pub const supported_file: &'static [&'static str] = &["ego-Facebook"];
 
 impl MyGraph_final{
-    pub fn new(file_name: Option<String>, file_loc: Option<String>, propa_model: PropagationModel) -> MyGraph_final{
+    ///build a graph from open data
+    pub fn build_graph_from_famous_open_data(file_name: &str, file_loc: &str){
         let read_file = false;
         
-        //if supported file
-        if file_name.is_some(){
-            //get it from supported_file
-            //set read_file = true
-            //TODO
+        //get it from supported_file
+        //set read_file = true
+        //TODO
 
-        }
-
-        //if read_file is correct
         //read file
         //TODO
+        let file_name = String::from(file_name);
         if read_file{
-            match file_name{
-                Some(a) => {
-                    let ego_Facebook = String::from("ego-Facebook");
-                    match a{
-                        ego_Facebook => {
-                            //read file and create graph
-                            //TODO
-                            //return MyGraph_final here
-                            }, 
-                    }
-                    
-                }
-                _ => (),
-            }
-        } 
+            match file_name.as_ref(){
+                "ego-Facebook" => (),
+                &_ => (),
+            };
+        }
+    }
 
+    /// Creates a new `Graph` for a given model.
+    pub fn new(propa_model: PropagationModel) -> MyGraph_final{
         MyGraph_final{
             graph: rs_graph::linkedlistgraph::LinkedListGraph::<u32, MyNodeData, MyEdgeData, ()>::new(),
             nodedata: Vec::new(),
@@ -117,12 +107,12 @@ impl MyGraph_final{
     
     }
 
-    ///node id to node
+    /// Looks up a `Node` by its ID.
     pub fn get_id2node(&mut self, id: usize) -> rs_graph::linkedlistgraph::Node{
         self.graph.id2node(id)
     }
 
-    ///edge id to edge
+    /// Looks up an `Edge` by its ID.
     pub fn get_id2edge(&mut self, id: usize) -> rs_graph::linkedlistgraph::Edge{
         self.graph.id2edge(id)
     }
@@ -168,7 +158,7 @@ impl MyGraph_final{
 
     ///given edge, get node from and node to
     pub fn get_edge_nodes(&mut self, e : rs_graph::linkedlistgraph::Edge) -> (rs_graph::linkedlistgraph::Node, rs_graph::linkedlistgraph::Node){
-        (self.get_id2edge(self.graph.edge(e).from), self.get_id2edge(self.graph.edge(e).to))
+        (self.get_id2node(self.graph.edge(e).from), self.get_id2node(self.graph.edge(e).to))
     }
 
     ///get neighbors
@@ -213,7 +203,7 @@ impl MyGraph_final{
     }
 
     ///initialize node label to 0
-    pub fn Initialize_Node_Label(&mut self){
+    pub fn initialize_node_label(&mut self){
         let nodes = self.graph.nodes();
 
         for i in nodes{
@@ -222,7 +212,7 @@ impl MyGraph_final{
     }
 
     ///initialize nodes' threshold to random between 0 and 1, or to a baseline
-    pub fn Initialize_Node_Threshold(&mut self, set: ThresholdSet){
+    pub fn initialize_node_threshold(&mut self, set: ThresholdSet){
         let nodes = self.graph.nodes();
         for i in nodes{
             match set{
@@ -233,7 +223,7 @@ impl MyGraph_final{
     }
 
     ///initialize edge label to 0
-    pub fn Initialize_Edge_Label(&mut self){
+    pub fn initialize_edge_label(&mut self){
         let edges = self.graph.edges();
 
         for i in edges{
@@ -244,7 +234,7 @@ impl MyGraph_final{
     }
 
     ///initialized edge weight which means n1 to n2, is directed
-    pub fn Initialize_Weight(&mut self, way: WeightSet){
+    pub fn initialize_weight(&mut self, way: WeightSet){
         match way{
             WeightSet::random => {
                 let edges = self.graph.edges();
@@ -267,19 +257,19 @@ impl MyGraph_final{
     }
 
     ///set weight n1 to n2
-    pub fn setWeight(&mut self, e: rs_graph::linkedlistgraph::Edge, weight: f64){
+    pub fn set_weight(&mut self, e: rs_graph::linkedlistgraph::Edge, weight: f64){
         self.graph.edge_mut(e).weight_1t2 = weight;
         let reverse_edge = self.graph.id2edge(self.graph.edge(e).reverse_edge);
         self.graph.edge_mut(reverse_edge).weight_2t1 = weight;
     }
 
     ///set node's threshold
-    pub fn setThreshold(&mut self, n: rs_graph::linkedlistgraph::Node, threshold: f64){
+    pub fn set_threshold(&mut self, n: rs_graph::linkedlistgraph::Node, threshold: f64){
         self.graph.node_mut(n).threshold = threshold;
     }
 
     ///set node's label
-    pub fn setNodeLabel(&mut self, n: rs_graph::linkedlistgraph::Node, label: usize){
+    pub fn set_node_label(&mut self, n: rs_graph::linkedlistgraph::Node, label: usize){
         self.graph.node_mut(n).label = label;
     }
 
@@ -290,7 +280,7 @@ impl MyGraph_final{
 
     ///maybe we don't need this one
     ///set edge labe
-    pub fn setEdgeLabel(&mut self, e: rs_graph::linkedlistgraph::Edge, label: usize){
+    pub fn set_edge_label(&mut self, e: rs_graph::linkedlistgraph::Edge, label: usize){
         self.graph.edge_mut(e).label_1t2 = label;
         let reverse_edge = self.graph.edge(e).reverse_edge;
         let reverse_edge = self.get_id2edge(reverse_edge);
@@ -298,7 +288,7 @@ impl MyGraph_final{
     }
 
     ///select seeds
-    pub fn selectSeed(&mut self, way: SeedSelection, num: usize, label: usize){
+    pub fn select_seeds(&mut self, way: SeedSelection, num: usize, label: usize){
         match way{
             SeedSelection::max_degree => {
 
@@ -311,7 +301,7 @@ impl MyGraph_final{
                 for _ in 0..num{
                     let new_pick = rand::thread_rng().gen_range(0, node_size);
                     let n = self.get_id2node(new_pick);
-                    self.setNodeLabel(n, label);
+                    self.set_node_label(n, label);
                     self.seed.push(new_pick);
                     //need to consider pick duplicate one
                     //if label != 0, reselect another one
@@ -323,7 +313,7 @@ impl MyGraph_final{
 
 
     ///before propagation, put seed into next to propagate
-    pub fn initialize_Propagate(&mut self){
+    pub fn initialize_propagation(&mut self){
 
         self.next_to_propagate = self.seed.clone();
     }
@@ -365,14 +355,14 @@ impl MyGraph_final{
                         
                         //set new node label and put into next_run
                         for n in triggeredNode{
-                            self.setNodeLabel(n, new_label);
+                            self.set_node_label(n, new_label);
                             let id = self.get_node_id(n);
                             self.next_to_propagate.push(id);
                         }
 
                         //set new edge label
                         for e in triggeredEdge{
-                            self.setEdgeLabel(e, new_label);
+                            self.set_edge_label(e, new_label);
                         }
 
                     }
@@ -386,6 +376,7 @@ impl MyGraph_final{
     }
 }
 
+/*
 fn main() {
     
     build_My_Graph_test();
@@ -408,10 +399,10 @@ fn build_My_Graph_test(){
     );
 
     //initialize graph data setting
-    myG.Initialize_Node_Label();
-    myG.Initialize_Node_Threshold(ThresholdSet::baseline(0.1));
-    myG.Initialize_Edge_Label();
-    myG.Initialize_Weight(WeightSet::random);
+    myG.initialize_node_label();
+    myG.initialize_node_threshold(ThresholdSet::baseline(0.1));
+    myG.initialize_edge_label();
+    myG.initialize_weight(WeightSet::random);
 
     for i in myG.graph.nodes(){
         println!("id:{} label:{} Threshold:{}", myG.graph.node_id(i), myG.graph.node(i).label, myG.graph.node(i).threshold);
@@ -430,7 +421,7 @@ fn build_My_Graph_test(){
     }
 
     //select seeds
-    myG.selectSeed(SeedSelection::random, 1, 1);
+    myG.select_seeds(SeedSelection::random, 1, 1);
 
     println!("seed");
     for i in &myG.seed{
@@ -438,7 +429,7 @@ fn build_My_Graph_test(){
     }
 
     //initialize propagation, needs to be done after select seeds
-    myG.initialize_Propagate();
+    myG.initialize_propagation();
 
     //run propagataion
     myG.propagte(10);
@@ -457,3 +448,4 @@ fn build_My_Graph_test(){
     println!("result: {} nodes with label 1", counter);
 
 }
+*/
