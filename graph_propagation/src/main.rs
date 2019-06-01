@@ -395,10 +395,10 @@ fn main() {
 
 // #[cfg_attr(feature = "cargo-clippy", allow(needless_range_loop))]
 fn build_My_Graph_test(){
-    println!("enter build my graph test");
+println!("enter build my graph test");
 
     //build a graph with three nodes and 2 edges
-    let mut myG = graph_propagation::MyGraph_final::new(None, None, PropagationModel::IC);
+    let mut myG = MyGraph_final::new(PropagationModel::IC);
     let (n1, n2, n3) = (
                         myG.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5}),
                         myG.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5}),
@@ -410,10 +410,10 @@ fn build_My_Graph_test(){
     );
 
     //initialize graph data setting
-    myG.Initialize_Node_Label();
-    myG.Initialize_Node_Threshold(ThresholdSet::baseline(0.1));
-    myG.Initialize_Edge_Label();
-    myG.Initialize_Weight(WeightSet::random);
+    myG.initialize_node_label();
+    myG.initialize_node_threshold(ThresholdSet::baseline(0.1));
+    myG.initialize_edge_label();
+    myG.initialize_weight(WeightSet::random);
 
     for i in myG.graph.nodes(){
         println!("id:{} label:{} Threshold:{}", myG.graph.node_id(i), myG.graph.node(i).label, myG.graph.node(i).threshold);
@@ -432,7 +432,7 @@ fn build_My_Graph_test(){
     }
 
     //select seeds
-    myG.selectSeed(SeedSelection::random, 1, 1);
+    myG.select_seeds(SeedSelection::random, 1, 1);
 
     println!("seed");
     for i in &myG.seed{
@@ -440,7 +440,7 @@ fn build_My_Graph_test(){
     }
 
     //initialize propagation, needs to be done after select seeds
-    myG.initialize_Propagate();
+    myG.initialize_propagation();
 
     //run propagataion
     myG.propagte(10);
