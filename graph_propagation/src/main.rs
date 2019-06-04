@@ -591,7 +591,7 @@ fn build_my_graph_5x5(){
     //20-21-22-23-24
     for i in 0..5{
         for j in 0..4{
-            println!("{} {} {}", i.clone()*5 + j.clone(), i.clone(), j.clone());
+            // println!("{} {} {}", i.clone()*5 + j.clone(), i.clone(), j.clone());
             my_g.add_edge(nodes[i*5 + j].clone(), nodes[i*5 + j + 1].clone(), MyEdgeData::new(i*5+j, i*5+j+1));
         }
         for j in 0..5{
@@ -602,30 +602,30 @@ fn build_my_graph_5x5(){
         }
     }
 
-    print!("after create edges");
+    println!("after create edges");
 
     //initialize graph data setting
     my_g.initialize_node_label();
-    my_g.initialize_node_threshold(ThresholdSet::Random);
+    // my_g.initialize_node_threshold(ThresholdSet::Random);
     my_g.initialize_edge_label();
-    my_g.initialize_weight(WeightSet::OneOverOutdegree);
+    my_g.initialize_weight(WeightSet::Equal(1.0));
 
-    for i in my_g.get_nodes(){
-        println!("id:{} label:{} Threshold:{}", my_g.get_node_id(i.clone()), my_g.get_node_label(i.clone()), my_g.get_node_threshold(i.clone()));
-    }
+    // for i in my_g.get_nodes(){
+    //     println!("id:{} label:{} Threshold:{}", my_g.get_node_id(i.clone()), my_g.get_node_label(i.clone()), my_g.get_node_threshold(i.clone()));
+    // }
 
-    for i in my_g.get_edges(){
-        let (f, t) = my_g.get_edge_nodes(i.clone());
-        println!("id:{} from:{} to:{} label_1t2:{} weight_1t2:{}",
-                my_g.get_edge_id(i.clone()),
-                my_g.get_node_id(f),
-                my_g.get_node_id(t),
-                my_g.get_edge_label(i.clone()),
-                my_g.get_edge_weight(i.clone()));
-    }
+    // for i in my_g.get_edges(){
+    //     let (f, t) = my_g.get_edge_nodes(i.clone());
+    //     println!("id:{} from:{} to:{} label_1t2:{} weight_1t2:{}",
+    //             my_g.get_edge_id(i.clone()),
+    //             my_g.get_node_id(f),
+    //             my_g.get_node_id(t),
+    //             my_g.get_edge_label(i.clone()),
+    //             my_g.get_edge_weight(i.clone()));
+    // }
 
     //select seeds
-    my_g.select_seeds(SeedSelection::MinDegree, 5, 1);
+    my_g.select_seeds(SeedSelection::MinDegree, 1, 1);
 
     println!("seed");
     for i in &my_g.seed{
@@ -636,7 +636,20 @@ fn build_my_graph_5x5(){
     my_g.initialize_propagation();
 
     //run propagataion
-    my_g.propagte(10);
+    for i in 0..10{
+        if i == 1{
+            println!("add blocks");
+            my_g.set_node_label(nodes[3].clone(), -1);
+            my_g.set_node_label(nodes[7].clone(), -1);
+            my_g.set_node_label(nodes[11].clone(), -1);
+            my_g.set_node_label(nodes[15].clone(), -1);
+        }
+        my_g.propagte(1);
+        if my_g.next_to_propagate.len() == 0{
+            println!("converge");
+            break;
+        }
+    }
 
     let nodes = my_g.get_nodes();
 
