@@ -390,12 +390,13 @@ impl MyGraph_final{
 
 fn main() {
     
-    build_My_Graph_test();
+    // build_My_Graph_test_IC();
+    build_My_Graph_test_LT();
 }
 
 // #[cfg_attr(feature = "cargo-clippy", allow(needless_range_loop))]
-fn build_My_Graph_test(){
-println!("enter build my graph test");
+fn build_My_Graph_test_IC(){
+    println!("enter build my graph test");
 
     //build a graph with three nodes and 2 edges
     let mut myG = MyGraph_final::new(PropagationModel::IC);
@@ -408,6 +409,9 @@ println!("enter build my graph test");
                         myG.add_edge(n1, n2, MyEdgeData{from: myG.graph.node_id(n1), to: myG.graph.node_id(n2), label_1t2: 0, weight_1t2: 1.0, label_2t1: 0, weight_2t1: 0.6, reverse_edge: 0}),
                         myG.add_edge(n1, n3, MyEdgeData{from: myG.graph.node_id(n1), to: myG.graph.node_id(n3), label_1t2: 0, weight_1t2: 1.0, label_2t1: 0, weight_2t1: 0.6, reverse_edge: 0})
     );
+    // let (e12) = (
+    //                     myG.add_edge(n1, n2, MyEdgeData{from: myG.graph.node_id(n1), to: myG.graph.node_id(n2), label_1t2: 0, weight_1t2: 1.0, label_2t1: 0, weight_2t1: 0.6, reverse_edge: 0}),
+    //                     );
 
     //initialize graph data setting
     myG.initialize_node_label();
@@ -432,8 +436,11 @@ println!("enter build my graph test");
     }
 
     //select seeds
-    myG.select_seeds(SeedSelection::random, 1, 1);
+    // myG.select_seeds(SeedSelection::random, 1, 1);
+    myG.select_seeds(SeedSelection::max_degree, 1, 1);
 
+    println!("n1 out degree: {}", myG.get_outdegrees(n1));
+    println!("n1 : {:?}", n1);
     println!("seed");
     for i in &myG.seed{
         println!("seed node id: {}", i);
@@ -457,5 +464,81 @@ println!("enter build my graph test");
     }
 
     println!("result: {} nodes with label 1", counter);
+
+    println!("get out degree: n1 {}", myG.get_outdegrees(n1));
+
+}
+
+fn build_My_Graph_test_LT(){
+    println!("enter build my graph test");
+
+    //build a graph with three nodes and 2 edges
+    let mut myG = MyGraph_final::new(PropagationModel::LT);
+    let (n1, n2, n3) = (
+                        myG.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5}),
+                        myG.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5}),
+                        myG.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5})
+    );
+    let (e12, e13) = (
+                        myG.add_edge(n1, n2, MyEdgeData{from: myG.graph.node_id(n1), to: myG.graph.node_id(n2), label_1t2: 0, weight_1t2: 1.0, label_2t1: 0, weight_2t1: 0.6, reverse_edge: 0}),
+                        myG.add_edge(n1, n3, MyEdgeData{from: myG.graph.node_id(n1), to: myG.graph.node_id(n3), label_1t2: 0, weight_1t2: 1.0, label_2t1: 0, weight_2t1: 0.6, reverse_edge: 0})
+    );
+    // let (e12) = (
+    //                     myG.add_edge(n1, n2, MyEdgeData{from: myG.graph.node_id(n1), to: myG.graph.node_id(n2), label_1t2: 0, weight_1t2: 1.0, label_2t1: 0, weight_2t1: 0.6, reverse_edge: 0}),
+    //                     );
+
+    //initialize graph data setting
+    myG.initialize_node_label();
+    myG.initialize_node_threshold(ThresholdSet::baseline(0.1));
+    myG.initialize_edge_label();
+    myG.initialize_weight(WeightSet::random);
+
+    for i in myG.graph.nodes(){
+        println!("id:{} label:{} Threshold:{}", myG.graph.node_id(i), myG.graph.node(i).label, myG.graph.node(i).threshold);
+    }
+
+    for i in myG.graph.edges(){
+        println!("id:{} from:{} to:{} label_1t2:{} label_2t1:{} weight_1t2:{} weight_2t1:{} reverse_edge_id:{}",
+                myG.graph.edge_id(i),
+                myG.graph.edge(i).from,
+                myG.graph.edge(i).to,
+                myG.graph.edge(i).label_1t2,
+                myG.graph.edge(i).label_2t1,
+                myG.graph.edge(i).weight_1t2,
+                myG.graph.edge(i).weight_2t1,
+                myG.graph.edge(i).reverse_edge);
+    }
+
+    //select seeds
+    // myG.select_seeds(SeedSelection::random, 1, 1);
+    myG.select_seeds(SeedSelection::max_degree, 1, 1);
+
+    println!("n1 out degree: {}", myG.get_outdegrees(n1));
+    println!("n1 : {:?}", n1);
+    println!("seed");
+    for i in &myG.seed{
+        println!("seed node id: {}", i);
+    }
+
+    //initialize propagation, needs to be done after select seeds
+    myG.initialize_propagation();
+
+    //run propagataion
+    myG.propagte(10);
+
+    let nodes = myG.get_nodes();
+
+    println!("node label == 1");
+    let mut counter = 0;
+    for i in nodes{
+        if myG.get_node_label(i) == 1{
+            println!("id:{} label:{} Threshold:{}", myG.graph.node_id(i), myG.graph.node(i).label, myG.graph.node(i).threshold);
+            counter += 1;
+        }
+    }
+
+    println!("result: {} nodes with label 1", counter);
+
+    println!("get out degree: n1 {}", myG.get_outdegrees(n1));
 
 }
