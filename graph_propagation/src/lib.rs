@@ -10,6 +10,8 @@ use rs_graph::builder::*;
 use crate::Builder;
 // use graph_propagation;
 
+// type NodeAttributes = rs_graph::attributes::NodeAttributes;
+
 ///MyGraph
 ///This is an undirected graph
 #[derive(Graph)]
@@ -173,7 +175,7 @@ impl MyGraph_final{
     pub fn get_outdegrees(&mut self, n: rs_graph::linkedlistgraph::Node) -> usize{
         let mut count = 0;
         for (edge, node) in self.graph.neighs(n){
-            println!("neighbor node id: {:?} neighbor edge id: {:?}", node, edge);
+            // println!("neighbor node id: {:?} neighbor edge id: {:?}", node, edge);
             count += 1;
         }
         count / 2
@@ -378,13 +380,13 @@ impl MyGraph_final{
         match way{
             SeedSelection::max_degree => {
                 let mut nodes: Vec<rs_graph::linkedlistgraph::Node> = self.graph.nodes().collect();
-                println!("nodes: {:?}", nodes);
+                // println!("nodes: {:?}", nodes);
                 nodes.sort_by(|a, b| self.get_outdegrees(*a).cmp(&self.get_outdegrees(*b)));
 
-                println!("nodes: {:?}", nodes);
+                // println!("nodes: {:?}", nodes);
 
                 for i in 0..num{
-                    println!("num - i - 1: {}", (self.get_nodes_number() - i - 1));
+                    // println!("num - i - 1: {}", (self.get_nodes_number() - i - 1));
                     let n = nodes[self.get_nodes_number() - i - 1];
                     self.set_node_label(n, label);
                     let new_pick = self.get_node_id(n);
@@ -393,10 +395,10 @@ impl MyGraph_final{
             },
             SeedSelection::min_degree => {
                 let mut nodes: Vec<rs_graph::linkedlistgraph::Node> = self.graph.nodes().collect();
-                println!("nodes: {:?}", nodes);
+                // println!("nodes: {:?}", nodes);
                 nodes.sort_by(|a, b| self.get_outdegrees(*a).cmp(&self.get_outdegrees(*b)));
 
-                println!("nodes: {:?}", nodes);
+                // println!("nodes: {:?}", nodes);
 
                 for i in 0..num{
                     let n = nodes[i];
@@ -480,6 +482,8 @@ impl MyGraph_final{
             },
             PropagationModel::LT => {
                 for num_runs in 0..runs{
+                    println!("propaget run: {} next_to_propagate:{}", num_runs, self.next_to_propagate.len());
+                    println!("{:?}", self.next_to_propagate);
                     if self.next_to_propagate.len() == 0{
                         println!("converge! runs:{}", num_runs);
                         break;
@@ -499,11 +503,21 @@ impl MyGraph_final{
                         
                         
                         //nodes affected by new triggered nodes
+                        //get_neighbors will give the same node neighbor twice because of edges n1ton2 and n2ton1
+                        let mut count = 0;
                         for (neighborsE, neighborsN) in self.get_neighbors(node_j) {
+                            if count % 2 == 1{
+                                continue;
+                            }
+                            count += 1;
+
                             potentialTriggeredNode.push(neighborsN);
                         }
 
                         for neighborsN in potentialTriggeredNode{
+                            if self.get_node_label(neighborsN) != 0{
+                                continue;
+                            }
                             let mut aggreated_influence: f64 = 0.0;
 
                             let mut influence_EN: Vec<(rs_graph::linkedlistgraph::Edge, rs_graph::linkedlistgraph::Node)> = self.get_neighbors(neighborsN).collect();
