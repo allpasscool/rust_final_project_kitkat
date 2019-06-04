@@ -472,14 +472,13 @@ impl Graph{
     }
 
     ///doing propagteion k rounds
-    //TODO
     pub fn propagte(&mut self, rounds: usize){
         
         match self.propagation_model{
             PropagationModel::IC => {
-                for num_rounds in 0..rounds{
+                for _num_rounds in 0..rounds{
                     if self.next_to_propagate.len() == 0{
-                        println!("converge! rounds:{}", num_rounds);
+                        // println!("converge! rounds:{}", num_rounds);
                         break;
                     }
 
@@ -495,7 +494,7 @@ impl Graph{
                         //get triggered neighbors
                         for (e, n) in self.graph.outedges(node_j.0){
                             //has been triggered
-                            if self.get_node_label(Node(n)) <= 0{
+                            if self.get_node_label(Node(n)) > 0{
                                 continue;
                             }
 
@@ -523,11 +522,11 @@ impl Graph{
                 }
             },
             PropagationModel::LT => {
-                for num_rounds in 0..rounds{
-                    println!("propaget rounds: {} next_to_propagate:{}", num_rounds, self.next_to_propagate.len());
+                for _num_rounds in 0..rounds{
+                    println!("propaget rounds: {} next_to_propagate:{}", _num_rounds, self.next_to_propagate.len());
                     println!("{:?}", self.next_to_propagate);
                     if self.next_to_propagate.len() == 0{
-                        println!("converge! rounds:{}", num_rounds);
+                        println!("converge! rounds:{}", _num_rounds);
                         break;
                     }
 
@@ -556,10 +555,14 @@ impl Graph{
                             potential_triggered_node.push(neighbors_n);
                         }
 
+                        println!("potential triggered nodes: {:?}", potential_triggered_node);
+
                         for neighbors_n in potential_triggered_node{
-                            if self.get_node_label(Node(neighbors_n)) <= 0{
+                            if self.get_node_label(Node(neighbors_n)) > 0{
+                                println!("label: {}", self.get_node_label(Node(neighbors_n)));
                                 continue;
                             }
+                            println!("before aggregate influence");
                             let mut aggreated_influence: f64 = 0.0;
 
                             let influence_en: Vec<(rs_graph::linkedlistgraph::Edge, rs_graph::linkedlistgraph::Node)> 
