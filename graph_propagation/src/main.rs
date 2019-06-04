@@ -391,7 +391,8 @@ impl MyGraph_final{
 fn main() {
     
     // build_my_graph_test_ic();
-    build_my_graph_test_lt();
+    // build_my_graph_test_lt();
+    build_my_graph_5x5();
 }
 
 // #[cfg_attr(feature = "cargo-clippy", allow(needless_range_loop))]
@@ -401,16 +402,16 @@ fn build_my_graph_test_ic(){
     //build a graph with three nodes and 2 edges
     let mut my_g = Graph::new(PropagationModel::IC);
     let (n1, n2, n3) = (
-                        my_g.add_node(MyNodeData{label: 0, threshold: 0.5}),
-                        my_g.add_node(MyNodeData{label: 0, threshold: 0.5}),
-                        my_g.add_node(MyNodeData{label: 0, threshold: 0.5})
+                        my_g.add_node(MyNodeData::new()),
+                        my_g.add_node(MyNodeData::new()),
+                        my_g.add_node(MyNodeData::new())
     );
     let n1_id = my_g.get_node_id(n1.clone());
     let n2_id = my_g.get_node_id(n2.clone());
     let n3_id = my_g.get_node_id(n3.clone());
     let (_e12, _e13) = (
-                        my_g.add_edge(n1.clone(), n2.clone(), MyEdgeData{from: n1_id, to: n2_id, label_1t2: 0, weight_1t2: 1.0, label_2t1: 0, weight_2t1: 0.6, reverse_edge: 0}),
-                        my_g.add_edge(n1.clone(), n3.clone(), MyEdgeData{from: n1_id, to: n3_id, label_1t2: 0, weight_1t2: 1.0, label_2t1: 0, weight_2t1: 0.6, reverse_edge: 0})
+                        my_g.add_edge(n1.clone(), n2.clone(), MyEdgeData::new(n1_id, n2_id)),
+                        my_g.add_edge(n1.clone(), n3.clone(), MyEdgeData::new(n1_id, n3_id))
     );
     // let (e12) = (
     //                     myG.add_edge(n1, n2, MyEdgeData{from: myG.graph.node_id(n1), to: myG.graph.node_id(n2), label_1t2: 0, weight_1t2: 1.0, label_2t1: 0, weight_2t1: 0.6, reverse_edge: 0}),
@@ -486,9 +487,9 @@ fn build_my_graph_test_lt(){
     //build a graph with three nodes and 2 edges
     let mut my_g = Graph::new(PropagationModel::LT);
     let (n1, n2, n3) = (
-                        my_g.add_node(MyNodeData{label: 0, threshold: 0.5}),
-                        my_g.add_node(MyNodeData{label: 0, threshold: 0.5}),
-                        my_g.add_node(MyNodeData{label: 0, threshold: 0.5})
+                        my_g.add_node(MyNodeData::new()),
+                        my_g.add_node(MyNodeData::new()),
+                        my_g.add_node(MyNodeData::new())
     );
 
     let n1_id = my_g.get_node_id(n1.clone());
@@ -496,8 +497,8 @@ fn build_my_graph_test_lt(){
     let n3_id = my_g.get_node_id(n3.clone());
 
     let (_e12, _e13) = (
-                        my_g.add_edge(n1.clone(), n2.clone(), MyEdgeData{from: n1_id, to: n2_id, label_1t2: 0, weight_1t2: 1.0, label_2t1: 0, weight_2t1: 0.6, reverse_edge: 0}),
-                        my_g.add_edge(n1.clone(), n3.clone(), MyEdgeData{from: n1_id, to: n3_id, label_1t2: 0, weight_1t2: 1.0, label_2t1: 0, weight_2t1: 0.6, reverse_edge: 0})
+                        my_g.add_edge(n1.clone(), n2.clone(), MyEdgeData::new(n1_id, n2_id)),
+                        my_g.add_edge(n1.clone(), n3.clone(), MyEdgeData::new(n1_id, n3_id))
     );
     // let (e12) = (
     //                     myG.add_edge(n1, n2, MyEdgeData{from: myG.graph.node_id(n1), to: myG.graph.node_id(n2), label_1t2: 0, weight_1t2: 1.0, label_2t1: 0, weight_2t1: 0.6, reverse_edge: 0}),
@@ -564,5 +565,90 @@ fn build_my_graph_test_lt(){
     println!("result: {} nodes with label 1", counter);
 
     println!("get out degree: n1 {}", my_g.get_outdegrees(n1));
+
+}
+
+fn build_my_graph_5x5(){
+    println!("enter build my graph test");
+
+    //build a graph with three nodes and 2 edges
+    let mut my_g = Graph::new(PropagationModel::IC);
+
+    for _ in 0..25{
+        my_g.add_node(MyNodeData::new());
+    }
+
+    let nodes: Vec<Node> = my_g.get_nodes().collect();
+    //add edges
+    // 0--1--2--3--4
+    // |  |  |  |  |
+    // 5--6--7--8--9
+    // |  |  |  |  |
+    //10-11-12-13-14
+    // |  |  |  |  |
+    //15-16-17-18-19
+    // |  |  |  |  |
+    //20-21-22-23-24
+    for i in 0..5{
+        for j in 0..4{
+            println!("{} {} {}", i.clone()*5 + j.clone(), i.clone(), j.clone());
+            my_g.add_edge(nodes[i*5 + j].clone(), nodes[i*5 + j + 1].clone(), MyEdgeData::new(i*5+j, i*5+j+1));
+        }
+        for j in 0..5{
+            if i == 4{
+                break;
+            }
+            my_g.add_edge(nodes[i*5 + j].clone(), nodes[(i+1)*5 + j].clone(), MyEdgeData::new(i*5+j, (i+1)*5+j));
+        }
+    }
+
+    print!("after create edges");
+
+    //initialize graph data setting
+    my_g.initialize_node_label();
+    my_g.initialize_node_threshold(ThresholdSet::Random);
+    my_g.initialize_edge_label();
+    my_g.initialize_weight(WeightSet::OneOverOutdegree);
+
+    for i in my_g.get_nodes(){
+        println!("id:{} label:{} Threshold:{}", my_g.get_node_id(i.clone()), my_g.get_node_label(i.clone()), my_g.get_node_threshold(i.clone()));
+    }
+
+    for i in my_g.get_edges(){
+        let (f, t) = my_g.get_edge_nodes(i.clone());
+        println!("id:{} from:{} to:{} label_1t2:{} weight_1t2:{}",
+                my_g.get_edge_id(i.clone()),
+                my_g.get_node_id(f),
+                my_g.get_node_id(t),
+                my_g.get_edge_label(i.clone()),
+                my_g.get_edge_weight(i.clone()));
+    }
+
+    //select seeds
+    my_g.select_seeds(SeedSelection::MinDegree, 5, 1);
+
+    println!("seed");
+    for i in &my_g.seed{
+        println!("seed node id: {}", i);
+    }
+
+    //initialize propagation, needs to be done after select seeds
+    my_g.initialize_propagation();
+
+    //run propagataion
+    my_g.propagte(10);
+
+    let nodes = my_g.get_nodes();
+
+    println!("node label == 1");
+    let mut counter = 0;
+    for i in nodes{
+        if my_g.get_node_label(i.clone()) == 1{
+            println!("id:{} label:{} Threshold:{}", my_g.get_node_id(i.clone()), my_g.get_node_label(i.clone()), my_g.get_node_threshold(i.clone()));
+            counter += 1;
+        }
+    }
+
+    println!("result: {} nodes with label 1", counter);
 
 }

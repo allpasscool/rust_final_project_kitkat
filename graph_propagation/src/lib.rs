@@ -1,3 +1,73 @@
+//! An undirect graph with Node attributed and Edge attribute
+//! 
+//! This is a linkedlist graph
+//! 
+//! You can use this graph to do social network analysis
+//! 
+//! There is a build-in propagate method
+//! 
+//! You can choose propagation model: IC or LT
+//! 
+//! You can select seeds based on MaxDegree, MinDeggree, or Random
+//! 
+//! You can set threshold to be Random or all to a value 
+//! 
+//! You can set weights to be 1/degree, Random, or the same value
+//! 
+//! 
+//! # Example
+//! ```
+//! use graph_propagation::*;
+//! 
+//! //build a graph with three nodes and 2 edges
+//! let mut my_g = Graph::new(PropagationModel::IC);
+//!
+//! for _ in 0..25{
+//!     my_g.add_node(MyNodeData::new());
+//! }
+//!
+//! let nodes: Vec<Node> = my_g.get_nodes().collect();
+//! //add edges
+//! // 0--1--2--3--4
+//! // |  |  |  |  |
+//! // 5--6--7--8--9
+//! // |  |  |  |  |
+//! //10-11-12-13-14
+//! // |  |  |  |  |
+//! //15-16-17-18-19
+//! // |  |  |  |  |
+//! //20-21-22-23-24
+//! for i in 0..5{
+//!     for j in 0..4{
+//!         println!("{} {} {}", i.clone()*5 + j.clone(), i.clone(), j.clone());
+//!         my_g.add_edge(nodes[i*5 + j].clone(), nodes[i*5 + j + 1].clone(), MyEdgeData::new(i*5+j, i*5+j+1));
+//!     }
+//!     for j in 0..5{
+//!         if i == 4{
+//!             break;
+//!         }
+//!         my_g.add_edge(nodes[i*5 + j].clone(), nodes[(i+1)*5 + j].clone(), MyEdgeData::new(i*5+j, (i+1)*5+j));
+//!     }
+//! }
+//! 
+//! //initialize graph data setting
+//! my_g.initialize_node_label();
+//! my_g.initialize_node_threshold(ThresholdSet::Random);
+//! my_g.initialize_edge_label();
+//! my_g.initialize_weight(WeightSet::OneOverOutdegree);
+//! 
+//! //select seeds
+//! my_g.select_seeds(SeedSelection::MinDegree, 5, 1);
+//! 
+//! //initialize propagation, needs to be done after select seeds
+//! my_g.initialize_propagation();
+//! 
+//! //run propagataion
+//! my_g.propagte(10);
+//! 
+//! ```
+//! 
+
 extern crate rand;
 
 // use rand::{thread_rng, Rng};
@@ -65,20 +135,68 @@ pub enum WeightSet{
 
 #[derive(Clone, Default)]
 pub struct MyNodeData {
-    pub label: usize,
-    pub threshold: f64,
+    label: i32,
+    threshold: f64,
     // pub influence: f64,
+}
+
+impl MyNodeData{
+    ///default value, label = 0, and threshold = 0.0
+    pub fn new() -> MyNodeData{
+        MyNodeData{
+            label: 0,
+            threshold: 0.0,
+        }
+    }
+
+    ///only be used when you're creating a new node
+    ///set label and threshold by your choice
+    pub fn set(label: i32, threshold: f64) -> MyNodeData{
+        MyNodeData{
+            label: label,
+            threshold: threshold,
+        }
+    }
 }
 
 #[derive(Clone, Default)]
 pub struct MyEdgeData {
-    pub from: usize,
-    pub to: usize,
-    pub label_1t2: usize,
-    pub weight_1t2: f64,
-    pub label_2t1: usize,
-    pub weight_2t1: f64,
-    pub reverse_edge: usize,
+    from: usize,
+    to: usize,
+    label_1t2: i32,
+    weight_1t2: f64,
+    label_2t1: i32,
+    weight_2t1: f64,
+    reverse_edge: usize,
+}
+
+impl MyEdgeData{
+    ///new(n1, n2) from:n1 to:n2 label_1t2:0 weight_1t2:0.0 label_2t1:0 weight_2t1:0.0 reverse_edge:0
+    pub fn new(n1: usize, n2:usize) -> MyEdgeData{
+        MyEdgeData{
+            from: n1,
+            to: n2,
+            label_1t2: 0,
+            weight_1t2: 0.0,
+            label_2t1: 0,
+            weight_2t1: 0.0,
+            reverse_edge: 0,
+        }
+    }
+
+    ///only be used when you're creating a new edge
+    ///set label and threshold by your choice, reverse_edge:0 
+    pub fn set(n1: usize, n2:usize, l_1t2: i32, w_1t2: f64, l_2t1: i32, w_2t1: f64) -> MyEdgeData{
+        MyEdgeData{
+            from: n1,
+            to: n2,
+            label_1t2: l_1t2,
+            weight_1t2: w_1t2,
+            label_2t1: l_2t1,
+            weight_2t1: w_2t1,
+            reverse_edge: 0,
+        }
+    }
 }
 
 // supported data file
@@ -230,13 +348,13 @@ impl Graph{
     
 
     ///get node label
-    pub fn get_node_label(&self, n: Node) -> usize{
+    pub fn get_node_label(&self, n: Node) -> i32{
         self.graph.node(n.0).label
     }
 
     ///get edge label 1t2
     ///if we can visualize the graph, we will need labels for edges. keep this one for the future
-    pub fn get_edge_label(&self, e: Edge) -> usize{
+    pub fn get_edge_label(&self, e: Edge) -> i32{
         self.graph.edge(e.0).label_1t2
     }
 
@@ -255,7 +373,18 @@ impl Graph{
     }
 
     ///add edge
+    /// while add edge, don't need to worry reverse edge
+    /// you can put any value to reverse_edge
+    /// it will be fixed automatically
     pub fn add_edge(&mut self, n1: Node, n2: Node, data: MyEdgeData) -> Edge{
+        let new_edge1 = self.graph.add_edge(n1.0, n2.0);
+        self.graph.edge_mut(new_edge1).from = self.graph.node_id(n1.0);
+        self.graph.edge_mut(new_edge1).to = self.graph.node_id(n2.0);
+        self.graph.edge_mut(new_edge1).label_1t2 = data.label_1t2;
+        self.graph.edge_mut(new_edge1).weight_1t2 = data.weight_1t2;
+        self.graph.edge_mut(new_edge1).label_2t1 = data.label_2t1;
+        self.graph.edge_mut(new_edge1).weight_2t1 = data.weight_2t1;
+
         let new_edge = self.graph.add_edge(n2.0, n1.0);
         self.graph.edge_mut(new_edge).from = self.graph.node_id(n2.0);
         self.graph.edge_mut(new_edge).to = self.graph.node_id(n1.0);
@@ -264,13 +393,7 @@ impl Graph{
         self.graph.edge_mut(new_edge).label_2t1 = data.label_1t2;
         self.graph.edge_mut(new_edge).weight_2t1 = data.weight_1t2;
         
-        let new_edge1 = self.graph.add_edge(n1.0, n2.0);
-        self.graph.edge_mut(new_edge1).from = self.graph.node_id(n1.0);
-        self.graph.edge_mut(new_edge1).to = self.graph.node_id(n2.0);
-        self.graph.edge_mut(new_edge1).label_1t2 = data.label_1t2;
-        self.graph.edge_mut(new_edge1).weight_1t2 = data.weight_1t2;
-        self.graph.edge_mut(new_edge1).label_2t1 = data.label_2t1;
-        self.graph.edge_mut(new_edge1).weight_2t1 = data.weight_2t1;
+        
 
         self.graph.edge_mut(new_edge).reverse_edge = self.graph.edge_id(new_edge1);
         self.graph.edge_mut(new_edge1).reverse_edge = self.graph.edge_id(new_edge);
@@ -401,7 +524,7 @@ impl Graph{
     }
 
     ///set node's label
-    pub fn set_node_label(&mut self, n: Node, label: usize){
+    pub fn set_node_label(&mut self, n: Node, label: i32){
         self.graph.node_mut(n.0).label = label;
     }
 
@@ -413,7 +536,7 @@ impl Graph{
     ///maybe we don't need this one
     ///set edge label
     /// if we can visualize our graph, then we will need edges' label. keep this one for the future.
-    pub fn set_edge_label(&mut self, e: Edge, label: usize){
+    pub fn set_edge_label(&mut self, e: Edge, label: i32){
         self.graph.edge_mut(e.0).label_1t2 = label;
         let reverse_edge = self.graph.edge(e.0).reverse_edge;
         let reverse_edge = self.get_id2edge(reverse_edge);
@@ -421,7 +544,7 @@ impl Graph{
     }
 
     ///select seeds
-    pub fn select_seeds(&mut self, way: SeedSelection, num: usize, label: usize){
+    pub fn select_seeds(&mut self, way: SeedSelection, num: usize, label: i32){
         match way{
             SeedSelection::MaxDegree => {
                 let mut nodes: Vec<rs_graph::linkedlistgraph::Node> = self.graph.nodes().collect();
@@ -471,14 +594,18 @@ impl Graph{
         self.next_to_propagate = self.seed.clone();
     }
 
+
+    ///label with smaller 0 or bigger than 0 won't be affected by others
     ///doing propagteion k rounds
     pub fn propagte(&mut self, rounds: usize){
         
         match self.propagation_model{
             PropagationModel::IC => {
                 for _num_rounds in 0..rounds{
+                    println!("propaget rounds: {} next_to_propagate:{}", _num_rounds, self.next_to_propagate.len());
+                    println!("{:?}", self.next_to_propagate);
                     if self.next_to_propagate.len() == 0{
-                        // println!("converge! rounds:{}", num_rounds);
+                        println!("converge! rounds:{}", _num_rounds);
                         break;
                     }
 
@@ -494,7 +621,7 @@ impl Graph{
                         //get triggered neighbors
                         for (e, n) in self.graph.outedges(node_j.0){
                             //has been triggered
-                            if self.get_node_label(Node(n)) > 0{
+                            if self.get_node_label(Node(n)) > 0 || self.get_node_label(Node(n)) < 0{
                                 continue;
                             }
 
@@ -547,22 +674,31 @@ impl Graph{
                         //get_neighbors will give the same node neighbor twice because of edges n1ton2 and n2ton1
                         let mut count = 0;
                         for (_neighbors_e, neighbors_n) in self.graph.neighs(node_j.0) {
-                            if count % 2 == 1{
+                            // println!("{:?} {:?}", _neighbors_e, neighbors_n.clone());
+                            
+                            if count % 2 == 0{
+                                count += 1;
                                 continue;
                             }
                             count += 1;
+                            
+                            //node has been triggered
+                            if self.get_node_label(Node(neighbors_n)) > 0 || self.get_node_label(Node(neighbors_n)) < 0{
+                                // println!("label: {}", self.get_node_label(Node(neighbors_n)));
+                                continue;
+                            }
 
                             potential_triggered_node.push(neighbors_n);
                         }
 
-                        println!("potential triggered nodes: {:?}", potential_triggered_node);
+                        // println!("potential triggered nodes: {:?}", potential_triggered_node);
 
                         for neighbors_n in potential_triggered_node{
-                            if self.get_node_label(Node(neighbors_n)) > 0{
-                                println!("label: {}", self.get_node_label(Node(neighbors_n)));
+                            if self.get_node_label(Node(neighbors_n)) > 0 || self.get_node_label(Node(neighbors_n)) < 0{
+                                // println!("label: {}", self.get_node_label(Node(neighbors_n)));
                                 continue;
                             }
-                            println!("before aggregate influence");
+                            // println!("before aggregate influence");
                             let mut aggreated_influence: f64 = 0.0;
 
                             let influence_en: Vec<(rs_graph::linkedlistgraph::Edge, rs_graph::linkedlistgraph::Node)> 
@@ -584,6 +720,9 @@ impl Graph{
 
                         //set new node label and put into next_run
                         for n in triggered_node{
+                            if self.graph.node(n).label < 0 || self.graph.node(n).label > 0{
+                                continue;
+                            }
                             self.set_node_label(Node(n), new_label);
                             let id = self.get_node_id(Node(n));
                             self.next_to_propagate.push(id);
