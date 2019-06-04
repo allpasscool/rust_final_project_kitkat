@@ -626,7 +626,7 @@ impl Graph{
                             }
 
                             let dice: f64 = rand::thread_rng().gen();
-                            if dice > self.graph.edge(e).weight_1t2{
+                            if dice < self.graph.edge(e).weight_1t2{
                                 triggered_node.push(n.clone());
                                 triggered_edge.push(e.clone());
                             }
