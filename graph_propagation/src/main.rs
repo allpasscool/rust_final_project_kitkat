@@ -1,14 +1,14 @@
 extern crate rand;
 extern crate graph_propagation;
 
-use rand::{thread_rng, Rng};
-use rs_graph_derive::Graph;
-use rs_graph::{traits::*};
-use rs_graph::linkedlistgraph::*;
+// use rand::{thread_rng, Rng};
+// use rs_graph_derive::Graph;
+// use rs_graph::{traits::*};
+// use rs_graph::linkedlistgraph::*;
 // use rs_graph::classes;
-use rs_graph::attributes::{NodeAttributes, EdgeAttributes, AttributedGraph};
-use rs_graph::builder::*;
-use crate::Builder;
+// use rs_graph::attributes::{NodeAttributes, EdgeAttributes, AttributedGraph};
+// use rs_graph::builder::*;
+// use crate::Builder;
 use graph_propagation::*;
 
 /*
@@ -390,72 +390,179 @@ impl MyGraph_final{
 
 fn main() {
     
-    build_My_Graph_test();
+    // build_my_graph_test_ic();
+    build_my_graph_test_lt();
 }
 
 // #[cfg_attr(feature = "cargo-clippy", allow(needless_range_loop))]
-fn build_My_Graph_test(){
-println!("enter build my graph test");
+fn build_my_graph_test_ic(){
+    println!("enter build my graph test");
 
     //build a graph with three nodes and 2 edges
-    let mut myG = MyGraph_final::new(PropagationModel::IC);
+    let mut my_g = MyGraph_final::new(PropagationModel::IC);
     let (n1, n2, n3) = (
-                        myG.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5}),
-                        myG.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5}),
-                        myG.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5})
+                        my_g.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5}),
+                        my_g.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5}),
+                        my_g.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5})
     );
+    let n1_id = my_g.get_node_id(n1);
+    let n2_id = my_g.get_node_id(n2);
+    let n3_id = my_g.get_node_id(n3);
     let (e12, e13) = (
-                        myG.add_edge(n1, n2, MyEdgeData{from: myG.graph.node_id(n1), to: myG.graph.node_id(n2), label_1t2: 0, weight_1t2: 1.0, label_2t1: 0, weight_2t1: 0.6, reverse_edge: 0}),
-                        myG.add_edge(n1, n3, MyEdgeData{from: myG.graph.node_id(n1), to: myG.graph.node_id(n3), label_1t2: 0, weight_1t2: 1.0, label_2t1: 0, weight_2t1: 0.6, reverse_edge: 0})
+                        my_g.add_edge(n1, n2, MyEdgeData{from: n1_id, to: n2_id, label_1t2: 0, weight_1t2: 1.0, label_2t1: 0, weight_2t1: 0.6, reverse_edge: 0}),
+                        my_g.add_edge(n1, n3, MyEdgeData{from: n1_id, to: n3_id, label_1t2: 0, weight_1t2: 1.0, label_2t1: 0, weight_2t1: 0.6, reverse_edge: 0})
     );
+    // let (e12) = (
+    //                     myG.add_edge(n1, n2, MyEdgeData{from: myG.graph.node_id(n1), to: myG.graph.node_id(n2), label_1t2: 0, weight_1t2: 1.0, label_2t1: 0, weight_2t1: 0.6, reverse_edge: 0}),
+    //                     );
 
     //initialize graph data setting
-    myG.initialize_node_label();
-    myG.initialize_node_threshold(ThresholdSet::baseline(0.1));
-    myG.initialize_edge_label();
-    myG.initialize_weight(WeightSet::random);
+    my_g.initialize_node_label();
+    my_g.initialize_node_threshold(ThresholdSet::baseline(0.1));
+    my_g.initialize_edge_label();
+    my_g.initialize_weight(WeightSet::random);
 
-    for i in myG.graph.nodes(){
-        println!("id:{} label:{} Threshold:{}", myG.graph.node_id(i), myG.graph.node(i).label, myG.graph.node(i).threshold);
+    for i in my_g.get_nodes(){
+        // println!("id:{} label:{} Threshold:{}", my_g.graph.node_id(i), my_g.graph.node(i).label, my_g.graph.node(i).threshold);
+        println!("id:{} label:{} Threshold:{}", my_g.get_node_id(i), my_g.get_node_label(i), my_g.get_node_threshold(i));
     }
 
-    for i in myG.graph.edges(){
-        println!("id:{} from:{} to:{} label_1t2:{} label_2t1:{} weight_1t2:{} weight_2t1:{} reverse_edge_id:{}",
-                myG.graph.edge_id(i),
-                myG.graph.edge(i).from,
-                myG.graph.edge(i).to,
-                myG.graph.edge(i).label_1t2,
-                myG.graph.edge(i).label_2t1,
-                myG.graph.edge(i).weight_1t2,
-                myG.graph.edge(i).weight_2t1,
-                myG.graph.edge(i).reverse_edge);
+    for i in my_g.get_edges(){
+        let (f, t) = my_g.get_edge_nodes(i);
+        // println!("id:{} from:{} to:{} label_1t2:{} label_2t1:{} weight_1t2:{} weight_2t1:{} reverse_edge_id:{}",
+        //         my_g.graph.edge_id(i),
+        //         my_g.graph.edge(i).from,
+        //         my_g.graph.edge(i).to,
+        //         my_g.graph.edge(i).label_1t2,
+        //         my_g.graph.edge(i).label_2t1,
+        //         my_g.graph.edge(i).weight_1t2,
+        //         my_g.graph.edge(i).weight_2t1,
+        //         my_g.graph.edge(i).reverse_edge);
+        println!("id:{} from:{} to:{} label_1t2:{} weight_1t2:{}",
+                my_g.get_edge_id(i),
+                f,
+                t,
+                my_g.get_edge_label(i),
+                my_g.get_edge_weight(i));
     }
 
     //select seeds
-    myG.select_seeds(SeedSelection::random, 1, 1);
+    // myG.select_seeds(SeedSelection::random, 1, 1);
+    my_g.select_seeds(SeedSelection::max_degree, 1, 1);
 
+    println!("n1 out degree: {}", my_g.get_outdegrees(n1));
+    println!("n1 : {:?}", n1);
     println!("seed");
-    for i in &myG.seed{
+    for i in &my_g.seed{
         println!("seed node id: {}", i);
     }
 
     //initialize propagation, needs to be done after select seeds
-    myG.initialize_propagation();
+    my_g.initialize_propagation();
 
     //run propagataion
-    myG.propagte(10);
+    my_g.propagte(10);
 
-    let nodes = myG.get_nodes();
+    let nodes = my_g.get_nodes();
 
     println!("node label == 1");
     let mut counter = 0;
     for i in nodes{
-        if myG.get_node_label(i) == 1{
-            println!("id:{} label:{} Threshold:{}", myG.graph.node_id(i), myG.graph.node(i).label, myG.graph.node(i).threshold);
+        if my_g.get_node_label(i) == 1{
+            println!("id:{} label:{} Threshold:{}", my_g.get_node_id(i), my_g.get_node_label(i), my_g.get_node_threshold(i));
             counter += 1;
         }
     }
 
     println!("result: {} nodes with label 1", counter);
+
+    println!("get out degree: n1 {}", my_g.get_outdegrees(n1));
+
+}
+
+fn build_my_graph_test_lt(){
+    println!("enter build my graph test");
+
+    //build a graph with three nodes and 2 edges
+    let mut my_g = MyGraph_final::new(PropagationModel::LT);
+    let (n1, n2, n3) = (
+                        my_g.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5}),
+                        my_g.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5}),
+                        my_g.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5})
+    );
+
+    let n1_id = my_g.get_node_id(n1);
+    let n2_id = my_g.get_node_id(n2);
+    let n3_id = my_g.get_node_id(n3);
+
+    let (e12, e13) = (
+                        my_g.add_edge(n1, n2, MyEdgeData{from: n1_id, to: n2_id, label_1t2: 0, weight_1t2: 1.0, label_2t1: 0, weight_2t1: 0.6, reverse_edge: 0}),
+                        my_g.add_edge(n1, n3, MyEdgeData{from: n1_id, to: n3_id, label_1t2: 0, weight_1t2: 1.0, label_2t1: 0, weight_2t1: 0.6, reverse_edge: 0})
+    );
+    // let (e12) = (
+    //                     myG.add_edge(n1, n2, MyEdgeData{from: myG.graph.node_id(n1), to: myG.graph.node_id(n2), label_1t2: 0, weight_1t2: 1.0, label_2t1: 0, weight_2t1: 0.6, reverse_edge: 0}),
+    //                     );
+
+    //initialize graph data setting
+    my_g.initialize_node_label();
+    my_g.initialize_node_threshold(ThresholdSet::baseline(0.1));
+    my_g.initialize_edge_label();
+    my_g.initialize_weight(WeightSet::random);
+
+    for i in my_g.get_nodes(){
+        // println!("id:{} label:{} Threshold:{}", my_g.graph.node_id(i), my_g.graph.node(i).label, my_g.graph.node(i).threshold);
+        println!("id:{} label:{} Threshold:{}", my_g.get_node_id(i), my_g.get_node_label(i), my_g.get_node_threshold(i));
+    }
+
+    for i in my_g.get_edges(){
+        // println!("id:{} from:{} to:{} label_1t2:{} label_2t1:{} weight_1t2:{} weight_2t1:{} reverse_edge_id:{}",
+        //         my_g.graph.edge_id(i),
+        //         my_g.graph.edge(i).from,
+        //         my_g.graph.edge(i).to,
+        //         my_g.graph.edge(i).label_1t2,
+        //         my_g.graph.edge(i).label_2t1,
+        //         my_g.graph.edge(i).weight_1t2,
+        //         my_g.graph.edge(i).weight_2t1,
+        //         my_g.graph.edge(i).reverse_edge);
+        let (f, t) = my_g.get_edge_nodes(i);
+        println!("id:{} from:{} to:{} label_1t2:{} weight_1t2:{}",
+                my_g.get_edge_id(i),
+                f,
+                t,
+                my_g.get_edge_label(i),
+                my_g.get_edge_weight(i));
+    }
+
+    //select seeds
+    // myG.select_seeds(SeedSelection::random, 1, 1);
+    my_g.select_seeds(SeedSelection::min_degree, 1, 1);
+
+    println!("n1 out degree: {}", my_g.get_outdegrees(n1));
+    println!("n1 : {:?}", n1);
+    println!("seed");
+    for i in &my_g.seed{
+        println!("seed node id: {}", i);
+    }
+
+    //initialize propagation, needs to be done after select seeds
+    my_g.initialize_propagation();
+
+    //run propagataion
+    my_g.propagte(10);
+
+    let nodes = my_g.get_nodes();
+
+    println!("node label == 1");
+    let mut counter = 0;
+    for i in nodes{
+        if my_g.get_node_label(i) == 1{
+            println!("id:{} label:{} Threshold:{}", my_g.get_node_id(i), my_g.get_node_label(i), my_g.get_node_threshold(i));
+            counter += 1;
+        }
+    }
+
+    println!("result: {} nodes with label 1", counter);
+
+    println!("get out degree: n1 {}", my_g.get_outdegrees(n1));
 
 }
