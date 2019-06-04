@@ -67,7 +67,7 @@ pub enum WeightSet{
 pub struct MyNodeData {
     pub label: usize,
     pub threshold: f64,
-    pub influence: f64,
+    // pub influence: f64,
 }
 
 #[derive(Clone, Default)]
@@ -136,14 +136,14 @@ impl Graph{
     }
 
     //TODO
-    pub fn get_node(){
+    // pub fn get_node(){
 
-    }
+    // }
 
     //TODO
-    pub fn get_edge(){
+    // pub fn get_edge(){
     
-    }
+    // }
 
     /// Looks up a `Node` by its ID.
     pub fn get_id2node(&self, id: usize) -> Node{
@@ -174,23 +174,14 @@ impl Graph{
         edge_iter
     }
 
-    ///get nodes number
+    ///Return the number of nodes in the graph.
     pub fn get_nodes_number(&self) -> usize{
         self.graph.num_nodes()
     }
 
-    ///get edges number
+    ///Return the number of edges in the graph.
     pub fn get_edges_number(&self) -> usize{
         self.graph.num_edges()
-    }
-
-    ///add new node with attribute
-    pub fn add_node(&mut self, data: MyNodeData) -> Node{
-        let new_node = self.graph.add_node();
-        self.graph.node_mut(new_node).label = data.label;
-        self.graph.node_mut(new_node).threshold = data.threshold;
-        self.graph.node_mut(new_node).influence = data.influence;
-        Node(new_node)
     }
 
     ///get node id
@@ -244,6 +235,7 @@ impl Graph{
     }
 
     ///get edge label 1t2
+    ///if we can visualize the graph, we will need labels for edges. keep this one for the future
     pub fn get_edge_label(&self, e: Edge) -> usize{
         self.graph.edge(e.0).label_1t2
     }
@@ -251,6 +243,15 @@ impl Graph{
     ///get edge weight 1t2
     pub fn get_edge_weight(&self, e: Edge) -> f64{
         self.graph.edge(e.0).weight_1t2
+    }
+    
+    ///add new node with attribute
+    pub fn add_node(&mut self, data: MyNodeData) -> Node{
+        let new_node = self.graph.add_node();
+        self.graph.node_mut(new_node).label = data.label;
+        self.graph.node_mut(new_node).threshold = data.threshold;
+        // self.graph.node_mut(new_node).influence = data.influence;
+        Node(new_node)
     }
 
     ///add edge
@@ -411,6 +412,7 @@ impl Graph{
 
     ///maybe we don't need this one
     ///set edge label
+    /// if we can visualize our graph, then we will need edges' label. keep this one for the future.
     pub fn set_edge_label(&mut self, e: Edge, label: usize){
         self.graph.edge_mut(e.0).label_1t2 = label;
         let reverse_edge = self.graph.edge(e.0).reverse_edge;
@@ -419,7 +421,6 @@ impl Graph{
     }
 
     ///select seeds
-    //need to finish random
     pub fn select_seeds(&mut self, way: SeedSelection, num: usize, label: usize){
         match way{
             SeedSelection::MaxDegree => {
@@ -470,15 +471,15 @@ impl Graph{
         self.next_to_propagate = self.seed.clone();
     }
 
-    ///doing propagteion k runs
+    ///doing propagteion k rounds
     //TODO
-    pub fn propagte(&mut self, runs: usize){
+    pub fn propagte(&mut self, rounds: usize){
         
         match self.propagation_model{
             PropagationModel::IC => {
-                for num_runs in 0..runs{
+                for num_rounds in 0..rounds{
                     if self.next_to_propagate.len() == 0{
-                        println!("converge! runs:{}", num_runs);
+                        println!("converge! rounds:{}", num_rounds);
                         break;
                     }
 
@@ -522,11 +523,11 @@ impl Graph{
                 }
             },
             PropagationModel::LT => {
-                for num_runs in 0..runs{
-                    println!("propaget run: {} next_to_propagate:{}", num_runs, self.next_to_propagate.len());
+                for num_rounds in 0..rounds{
+                    println!("propaget rounds: {} next_to_propagate:{}", num_rounds, self.next_to_propagate.len());
                     println!("{:?}", self.next_to_propagate);
                     if self.next_to_propagate.len() == 0{
-                        println!("converge! runs:{}", num_runs);
+                        println!("converge! rounds:{}", num_rounds);
                         break;
                     }
 

@@ -401,9 +401,9 @@ fn build_my_graph_test_ic(){
     //build a graph with three nodes and 2 edges
     let mut my_g = Graph::new(PropagationModel::IC);
     let (n1, n2, n3) = (
-                        my_g.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5}),
-                        my_g.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5}),
-                        my_g.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5})
+                        my_g.add_node(MyNodeData{label: 0, threshold: 0.5}),
+                        my_g.add_node(MyNodeData{label: 0, threshold: 0.5}),
+                        my_g.add_node(MyNodeData{label: 0, threshold: 0.5})
     );
     let n1_id = my_g.get_node_id(n1.clone());
     let n2_id = my_g.get_node_id(n2.clone());
@@ -486,9 +486,9 @@ fn build_my_graph_test_lt(){
     //build a graph with three nodes and 2 edges
     let mut my_g = Graph::new(PropagationModel::LT);
     let (n1, n2, n3) = (
-                        my_g.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5}),
-                        my_g.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5}),
-                        my_g.add_node(MyNodeData{label: 0, threshold: 0.5, influence: 0.5})
+                        my_g.add_node(MyNodeData{label: 0, threshold: 0.5}),
+                        my_g.add_node(MyNodeData{label: 0, threshold: 0.5}),
+                        my_g.add_node(MyNodeData{label: 0, threshold: 0.5})
     );
 
     let n1_id = my_g.get_node_id(n1.clone());
