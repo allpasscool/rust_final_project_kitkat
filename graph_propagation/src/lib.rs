@@ -733,3 +733,118 @@ impl Graph{
         }
     }
 }
+
+#[cfg(test)]
+mod tests{
+    use super::*;
+
+    //IC model
+    #[test]
+    fn test1(){
+        let mut my_g = super::Graph::new(PropagationModel::IC);
+
+        for _ in 0..25{
+            my_g.add_node(MyNodeData::new());
+        }
+
+        let nodes: Vec<super::Node> = my_g.get_nodes().collect();
+        //add edges
+        // 0--1--2--3--4
+        // |  |  |  |  |
+        // 5--6--7--8--9
+        // |  |  |  |  |
+        //10-11-12-13-14
+        // |  |  |  |  |
+        //15-16-17-18-19
+        // |  |  |  |  |
+        //20-21-22-23-24
+        for i in 0..5{
+            for j in 0..4{
+                // println!("{} {} {}", i.clone()*5 + j.clone(), i.clone(), j.clone());
+                my_g.add_edge(nodes[i*5 + j].clone(), nodes[i*5 + j + 1].clone(), MyEdgeData::new(i*5+j, i*5+j+1));
+            }
+            for j in 0..5{
+                if i == 4{
+                    break;
+                }
+                my_g.add_edge(nodes[i*5 + j].clone(), nodes[(i+1)*5 + j].clone(), MyEdgeData::new(i*5+j, (i+1)*5+j));
+            }
+        }
+
+        my_g.initialize_node_label();
+        // my_g.initialize_node_threshold(ThresholdSet::Random);
+        my_g.initialize_edge_label();
+        my_g.initialize_weight(WeightSet::Equal(1.0));
+
+        my_g.select_seeds(SeedSelection::MinDegree, 1, 1);
+
+        my_g.initialize_propagation();
+
+        my_g.propagte(10);
+
+        let mut counter = 0;
+        for i in nodes{
+            if my_g.get_node_label(i.clone()) == 1{
+                println!("id:{} label:{} Threshold:{}", my_g.get_node_id(i.clone()), my_g.get_node_label(i.clone()), my_g.get_node_threshold(i.clone()));
+                counter += 1;
+            }
+        }
+
+        assert_eq!(counter, 25);
+    }
+
+    //LT model
+    #[test]
+    fn test2(){
+        let mut my_g = super::Graph::new(PropagationModel::LT);
+
+        for _ in 0..25{
+            my_g.add_node(MyNodeData::new());
+        }
+
+        let nodes: Vec<super::Node> = my_g.get_nodes().collect();
+        //add edges
+        // 0--1--2--3--4
+        // |  |  |  |  |
+        // 5--6--7--8--9
+        // |  |  |  |  |
+        //10-11-12-13-14
+        // |  |  |  |  |
+        //15-16-17-18-19
+        // |  |  |  |  |
+        //20-21-22-23-24
+        for i in 0..5{
+            for j in 0..4{
+                // println!("{} {} {}", i.clone()*5 + j.clone(), i.clone(), j.clone());
+                my_g.add_edge(nodes[i*5 + j].clone(), nodes[i*5 + j + 1].clone(), MyEdgeData::new(i*5+j, i*5+j+1));
+            }
+            for j in 0..5{
+                if i == 4{
+                    break;
+                }
+                my_g.add_edge(nodes[i*5 + j].clone(), nodes[(i+1)*5 + j].clone(), MyEdgeData::new(i*5+j, (i+1)*5+j));
+            }
+        }
+
+        my_g.initialize_node_label();
+        my_g.initialize_node_threshold(ThresholdSet::Baseline(0.0));
+        my_g.initialize_edge_label();
+        my_g.initialize_weight(WeightSet::Equal(1.0));
+
+        my_g.select_seeds(SeedSelection::MinDegree, 1, 1);
+
+        my_g.initialize_propagation();
+
+        my_g.propagte(10);
+
+        let mut counter = 0;
+        for i in nodes{
+            if my_g.get_node_label(i.clone()) == 1{
+                println!("id:{} label:{} Threshold:{}", my_g.get_node_id(i.clone()), my_g.get_node_label(i.clone()), my_g.get_node_threshold(i.clone()));
+                counter += 1;
+            }
+        }
+
+        assert_eq!(counter, 25);
+    }
+}
