@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["BinHeap","Simply binary heap data structure."]]});

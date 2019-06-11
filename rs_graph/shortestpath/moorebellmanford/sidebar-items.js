@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["directed","The shortest-path algorithm by Moore-Bellman-Ford on a directed graph."],["undirected","The shortest-path algorithm by Moore-Bellman-Ford on an undirected graph."]]});

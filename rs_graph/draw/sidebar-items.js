@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["EdgeAttr","Trait for edge attributes."],["GraphDrawer","Trait for drawing sequences of graphs."],["NodeAttr","Trait for node attributes."]]});

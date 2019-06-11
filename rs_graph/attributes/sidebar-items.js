@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["AttributedGraph","A trait to split the graph and its attributes."],["BiEdgeAttributes","Object with associated biedge attributes."],["EdgeAttributes","Object with associated edge attributes."],["NodeAttributes","Object with associated node attributes."]]});

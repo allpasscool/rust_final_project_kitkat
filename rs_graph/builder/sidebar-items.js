@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["Buildable","A graph with a default builder."],["Builder","A trait to construct graphs."]]});

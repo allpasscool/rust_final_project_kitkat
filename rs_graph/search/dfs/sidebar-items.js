@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["default_data","Return the default data structure to be used in the DFS."],["start","Start and return a DFS iterator using default data structures."],["start_with_data","Start and return a DFS iterator with user defined data structures."]],"struct":[["DFS",""]],"type":[["DFSDefault","DFS iterator with default data structures."]]});

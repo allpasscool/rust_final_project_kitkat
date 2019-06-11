@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["BinHeap","Simply binary heap data structure."]],"trait":[["ItemMap","A (finite) map of items (node or edges) of a graph to some value."],["ItemPriQueue",""],["ItemQueue",""],["ItemSet","A (finite) set of items (node or edges) of a graph."],["ItemStack",""]]});

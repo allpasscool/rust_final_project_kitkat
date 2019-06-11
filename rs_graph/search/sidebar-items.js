@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["path_from_incomings","Compute a path from a map of incoming edges for each node."]],"mod":[["astar","A* search."],["bfs","Breadth-first-search."],["biastar","Bidirectional A*-search."],["dfs","Depth-first-search."]]});

@@ -1,0 +1,108 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `astar` mod in crate `rs_graph`."><meta name="keywords" content="rust, rustlang, rust-lang, astar"><title>rs_graph::search::astar - Rust</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Module astar</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li><li><a href="#types">Type Definitions</a></li></ul></div><p class='location'><a href='../../index.html'>rs_graph</a>::<wbr><a href='../index.html'>search</a></p><script>window.sidebarCurrent = {name: 'astar', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../../../src/rs_graph/search/astar.rs.html#18-651' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../../index.html'>rs_graph</a>::<wbr><a href='../index.html'>search</a>::<wbr><a class="mod" href=''>astar</a></span></h1><div class='docblock'><p>A* search.</p>
+<p>This module implements an A*-search for finding a shortest paths
+from some node to all other nodes. Each node may be assigned a
+potential (or &quot;heuristic value&quot;) estimating the distance to the target
+node. The potential $h\colon V \to \mathbb{R}$ must satisfy
+\[ w(u,v) - h(u) + h(v) \ge 0, (u,v) \in E \]
+where $w\colon E \to \mathbb{R}$ are the weights (or lengths) of the edges.
+(The relation must hold for both directions in case the graph is
+undirected).</p>
+<p>If $s \in V$ is the start node and $t$ some destination node, then
+$h(u) - h(t)$ is a lower bound on the distance from $u$ to $t$ for all nodes $u \in V$.
+Hence, f the shortest path to some specific destination node $t$ should be
+found the canonical choice for $h$ is such that $h(t) = 0$ and $h(u)$ is a
+lower bound on the distance from $u$ to $t$.</p>
+<h1 id="example" class="section-header"><a href="#example">Example</a></h1>
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="kw">use</span> <span class="ident">rs_graph</span>::<span class="ident">traits</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">rs_graph</span>::<span class="ident">search</span>::<span class="ident">astar</span>;
+<span class="kw">use</span> <span class="ident">rs_graph</span>::<span class="ident">string</span>::{<span class="ident">from_ascii</span>, <span class="ident">Data</span>};
+<span class="kw">use</span> <span class="ident">rs_graph</span>::<span class="ident">LinkedListGraph</span>;
+
+<span class="kw">let</span> <span class="ident">Data</span> {
+    <span class="ident">graph</span>: <span class="ident">g</span>,
+    <span class="ident">weights</span>,
+    <span class="ident">nodes</span>,
+} <span class="op">=</span> <span class="ident">from_ascii</span>::<span class="op">&lt;</span><span class="ident">LinkedListGraph</span><span class="op">&gt;</span>(
+    <span class="string">r&quot;
+    *--1--*--1--*--1--*--1--*--1--*--1--*--1--*
+    |     |     |     |     |     |     |     |
+    1     1     1     1     1     1     1     1
+    |     |     |     |     |     |     |     |
+    *--1--*--2--*--1--*--2--e--1--f--1--t--1--*
+    |     |     |     |     |     |     |     |
+    1     1     1     1     1     2     1     1
+    |     |     |     |     |     |     |     |
+    *--1--*--1--*--2--c--1--d--1--*--2--*--1--*
+    |     |     |     |     |     |     |     |
+    1     1     1     1     1     1     1     1
+    |     |     |     |     |     |     |     |
+    *--1--s--1--a--1--b--2--*--1--*--1--*--1--*
+    |     |     |     |     |     |     |     |
+    1     1     1     1     1     1     1     1
+    |     |     |     |     |     |     |     |
+    *--1--*--1--*--1--*--1--*--1--*--1--*--1--*
+    &quot;</span>,
+)
+.<span class="ident">unwrap</span>();
+
+<span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">nodes</span>[<span class="kw-2">&amp;</span><span class="string">&#39;s&#39;</span>];
+<span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">nodes</span>[<span class="kw-2">&amp;</span><span class="string">&#39;t&#39;</span>];
+
+<span class="comment">// nodes are numbered row-wise -&gt; get node coordinates</span>
+<span class="kw">let</span> <span class="ident">coords</span> <span class="op">=</span> <span class="op">|</span><span class="ident">u</span><span class="op">|</span> ((<span class="ident">g</span>.<span class="ident">node_id</span>(<span class="ident">u</span>) <span class="op">%</span> <span class="number">8</span>) <span class="kw">as</span> <span class="ident">isize</span>, (<span class="ident">g</span>.<span class="ident">node_id</span>(<span class="ident">u</span>) <span class="op">/</span> <span class="number">8</span>) <span class="kw">as</span> <span class="ident">isize</span>);
+
+<span class="kw">let</span> (<span class="ident">xs</span>, <span class="ident">ys</span>) <span class="op">=</span> <span class="ident">coords</span>(<span class="ident">s</span>);
+<span class="kw">let</span> (<span class="ident">xt</span>, <span class="ident">yt</span>) <span class="op">=</span> <span class="ident">coords</span>(<span class="ident">t</span>);
+
+<span class="comment">// manhatten distance heuristic</span>
+<span class="kw">let</span> <span class="ident">manh_heur</span> <span class="op">=</span> <span class="op">|</span><span class="ident">u</span><span class="op">|</span> {
+    <span class="kw">let</span> (<span class="ident">x</span>, <span class="ident">y</span>) <span class="op">=</span> <span class="ident">coords</span>(<span class="ident">u</span>);
+    ((<span class="ident">x</span> <span class="op">-</span> <span class="ident">xt</span>).<span class="ident">abs</span>() <span class="op">+</span> (<span class="ident">y</span> <span class="op">-</span> <span class="ident">yt</span>).<span class="ident">abs</span>()) <span class="kw">as</span> <span class="ident">usize</span>
+};
+
+<span class="comment">// verify that we do not go in the &quot;wrong&quot; direction</span>
+<span class="kw">for</span> (<span class="ident">v</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">in</span> <span class="ident">astar</span>::<span class="ident">start</span>(<span class="ident">g</span>.<span class="ident">neighbors</span>(), <span class="ident">s</span>, <span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">weights</span>[<span class="ident">e</span>.<span class="ident">index</span>()], <span class="ident">manh_heur</span>) {
+    <span class="kw">let</span> (<span class="ident">x</span>, <span class="ident">y</span>) <span class="op">=</span> <span class="ident">coords</span>(<span class="ident">v</span>);
+    <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">x</span> <span class="op">&gt;=</span> <span class="ident">xs</span> <span class="op">&amp;&amp;</span> <span class="ident">x</span> <span class="op">&lt;=</span> <span class="ident">xt</span> <span class="op">&amp;&amp;</span> <span class="ident">y</span> <span class="op">&gt;=</span> <span class="ident">yt</span> <span class="op">&amp;&amp;</span> <span class="ident">y</span> <span class="op">&lt;=</span> <span class="ident">ys</span>);
+    <span class="kw">if</span> <span class="ident">v</span> <span class="op">==</span> <span class="ident">t</span> {
+        <span class="kw">break</span>;
+    }
+}
+
+<span class="comment">// obtain the shortest path directly</span>
+<span class="kw">let</span> (<span class="ident">path</span>, <span class="ident">dist</span>) <span class="op">=</span> <span class="ident">astar</span>::<span class="ident">find_undirected_path</span>(<span class="kw-2">&amp;</span><span class="ident">g</span>, <span class="ident">s</span>, <span class="ident">t</span>, <span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">weights</span>[<span class="ident">e</span>.<span class="ident">index</span>()], <span class="ident">manh_heur</span>).<span class="ident">unwrap</span>();
+
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">dist</span>, <span class="number">7</span>);
+
+<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pathnodes</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">s</span>];
+<span class="kw">for</span> <span class="ident">e</span> <span class="kw">in</span> <span class="ident">path</span> {
+    <span class="kw">let</span> <span class="ident">uv</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">enodes</span>(<span class="ident">e</span>);
+    <span class="kw">if</span> <span class="ident">uv</span>.<span class="number">0</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">pathnodes</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>() {
+        <span class="ident">pathnodes</span>.<span class="ident">push</span>(<span class="ident">uv</span>.<span class="number">1</span>);
+    } <span class="kw">else</span> {
+        <span class="ident">pathnodes</span>.<span class="ident">push</span>(<span class="ident">uv</span>.<span class="number">0</span>);
+    }
+}
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">pathnodes</span>, <span class="string">&quot;sabcdeft&quot;</span>.<span class="ident">chars</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">nodes</span>[<span class="kw-2">&amp;</span><span class="ident">c</span>]).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;&gt;</span>());</pre></div>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table><tr class='module-item'><td><a class="struct" href="struct.AStar.html" title='rs_graph::search::astar::AStar struct'>AStar</a></td><td class='docblock-short'><p>A* search iterator.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.Data.html" title='rs_graph::search::astar::Data struct'>Data</a></td><td class='docblock-short'><p>The data stored with an edge during the search.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.SumAccumulator.html" title='rs_graph::search::astar::SumAccumulator struct'>SumAccumulator</a></td><td class='docblock-short'><p>Accumulates by adding distance and weight.</p>
+</td></tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
+<table><tr class='module-item'><td><a class="trait" href="trait.AStarHeuristic.html" title='rs_graph::search::astar::AStarHeuristic trait'>AStarHeuristic</a></td><td class='docblock-short'><p>A heuristic providing a node potential.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.Accumulator.html" title='rs_graph::search::astar::Accumulator trait'>Accumulator</a></td><td class='docblock-short'><p>A binary operation used to accumulate edge weight and distance.</p>
+</td></tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table><tr class='module-item'><td><a class="fn" href="fn.default_data.html" title='rs_graph::search::astar::default_data fn'>default_data</a></td><td class='docblock-short'><p>Return the default data structure to be used in the A*-search.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.find_directed_path.html" title='rs_graph::search::astar::find_directed_path fn'>find_directed_path</a></td><td class='docblock-short'><p>Run an A*-search on a directed graph and return the path.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.find_undirected_path.html" title='rs_graph::search::astar::find_undirected_path fn'>find_undirected_path</a></td><td class='docblock-short'><p>Run an A*-search on an undirected graph and return the path.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.start.html" title='rs_graph::search::astar::start fn'>start</a></td><td class='docblock-short'><p>Start and return an A*-iterator using default data structures.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.start_directed.html" title='rs_graph::search::astar::start_directed fn'>start_directed</a></td><td class='docblock-short'><p>Start an A*-search on a directed graph.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.start_generic.html" title='rs_graph::search::astar::start_generic fn'>start_generic</a></td><td class='docblock-short'><p>Start and return an A*-iterator with a custom accumulator and custom data structures.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.start_undirected.html" title='rs_graph::search::astar::start_undirected fn'>start_undirected</a></td><td class='docblock-short'><p>Start an A*-search on a undirected graph.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.start_with_data.html" title='rs_graph::search::astar::start_with_data fn'>start_with_data</a></td><td class='docblock-short'><p>Start and return an A*-iterator with custom data structures.</p>
+</td></tr></table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
+<table><tr class='module-item'><td><a class="type" href="type.AStarDefault.html" title='rs_graph::search::astar::AStarDefault type'>AStarDefault</a></td><td class='docblock-short'><p>The A*-iterator with default types.</p>
+</td></tr><tr class='module-item'><td><a class="type" href="type.DefaultMap.html" title='rs_graph::search::astar::DefaultMap type'>DefaultMap</a></td><td class='docblock-short'><p>Default map type to be used in an A* search.</p>
+</td></tr><tr class='module-item'><td><a class="type" href="type.DefaultPriQueue.html" title='rs_graph::search::astar::DefaultPriQueue type'>DefaultPriQueue</a></td><td class='docblock-short'><p>Default priority queue type to be used in an A* search.</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../";window.currentCrate = "rs_graph";</script><script src="../../../aliases.js"></script><script src="../../../main.js"></script><script defer src="../../../search-index.js"></script></body></html>

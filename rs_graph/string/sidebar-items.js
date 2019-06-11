@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Error",""]],"fn":[["from_ascii","Create a graph from ASCII art drawing with edge weights."]],"struct":[["Data","The data returned by `from_ascii`."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["default_data","Return the default data structure to be used in the BFS."],["start","Start and return a BFS iterator using default data structures."],["start_with_data","Start and return a BFS iterator with user defined data structures."]],"struct":[["BFS","The BFS iterator."]],"type":[["BFSDefault","BFS iterator with default data structures."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["kruskal","Run Kruskal's algorithm to solve the Minimum Spanning Tree problem on a graph."],["prim","Run Prim's algorithm to solve the Minimum Spanning Tree problem on a graph."],["worstout","Run Worst-Out-Greedy algorithm to solve the Minimum Spanning Tree problem on a graph."]]});

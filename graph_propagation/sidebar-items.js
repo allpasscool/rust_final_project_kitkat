@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["PropagationModel",""],["SeedSelection",""],["ThresholdSet",""],["WeightSet",""]],"struct":[["Edge",""],["Graph","MyGraph This is an undirected graph"],["Graph_Attributes",""],["MyEdgeData",""],["MyNodeData",""],["Node",""]]});

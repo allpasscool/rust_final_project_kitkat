@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["EdmondsKarp","Max-flow algorithm of Edmonds and Karp."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Item","Either a node or an edge."]],"fn":[["complement","Returns the complement of `g`."],["components","Determines all components of a graph."],["inverse","Returns the inverse directed graph of `g`."],["is_connected","Determines if a graph is connected."],["subgraph","Return a subgraph."]]});

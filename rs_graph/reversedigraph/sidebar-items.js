@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["reverse",""]],"struct":[["ReverseDigraph","A digraph wrapping an existing graph with edges in opposite directions."],["ReverseDigraphBuilder","Builder for a reversed digraph."]]});
